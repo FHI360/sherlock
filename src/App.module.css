@@ -6,6 +6,78 @@
     height: 100vh;
     position: relative;
 }
+.containerNav {
+    margin: 1rem;
+    text-align: center;
+}
+
+.nav {
+    background-color: #DCE1EA;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .site-title {
+    font-size: 2rem;
+  }
+  
+  .nav ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: flex;
+    background-color: #c1bfbf;
+    /* gap: 20rem; */
+    /* background-color: #2C6693; */
+  }
+  
+  .nav a {
+    color: white;
+    text-decoration: none;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: .25rem;
+    justify-content: center; 
+
+
+
+  }
+  
+  .nav li {
+
+    color: white;
+    height: 50px;
+    width: 200px;
+    font-size: large;
+    font-weight: bold;
+
+
+  }
+
+  /* .nav ul.active {
+    background-color: #2C6693;
+  } */
+  
+  .nav li:hover {
+    background-color: #555;
+    color: white; 
+  }
+
+  .nav a:hover {
+    background-color: #555;
+    color: white; 
+  }
+
+
+  .customLinkActive{
+    background-color: #555;
+    color: white !important;
+  }
 
 .topnav {
     background-color: #E5E8F3;
@@ -14,22 +86,13 @@
     width: 100%;
     z-index: 1000;
     display: flex;
-    justify-content: center; /* Center the links horizontally */
+    justify-content: center;
 
-    /* background-color: #E5E8F3;
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-    z-index: 1000; */
 }
 
-.topnav a {
-    /* float: left;
-    color: #2C6693;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none; */
 
+
+.topnav a {
     color: #2C6693;
     text-align: center;
     padding: 14px 16px;
@@ -49,16 +112,24 @@
 }
 
 .main {
-    margin-left: 303px;
+    /* margin-left: 303px; */
+    margin-left: 263px;
     display: flex;
     flex-grow: 1;
-    /* width: 100%; */
     border: 1px dotted black; 
 }
 
 .headerTitle {
-    margin-left: 321px;
+    margin-left: 266px;
+    margin-top: 50px;
 
+}
+.RuleDescription {
+
+    border: 1px solid #00796B; 
+    margin-top: 100px;
+    display: flex;
+    padding: 5px;
 }
 
 .panelmiddle {
@@ -75,21 +146,25 @@
     padding: 20px 20px 20px 20px;
     border: 1px;
     margin: 5px;
-    /* background-color: #818181; */
 }
 
 .sidenav {
     background-color: #F3F3F3;
-    /* padding-top: 20px; */
-    /* padding-bottom: 20px; */
-    width: 301px;
+    width: 263px;
     position: fixed;
-    top: 50px;
+    top: 100px;
     bottom: 0px;
     left: 0;
     z-index: 0;
 }
 
+.searchPanel {
+    background-color: #F3F3F3;
+    top: 200px;
+    bottom: 0px;
+    left: 0;
+    z-index: 0;
+}
 
 .marginTop {
     margin-top: 20px;
@@ -105,16 +180,14 @@
     background-color: #fff;
     border: 1px solid #ccc; /* Add border */
 }
-/* Target the selected items in the OrganisationUnitTree */
-.OrganisationUnitTree .selected {
-    color: blue !important; /* Change the text color to blue */
-    background-color: transparent !important; /* Remove any background color */
-}
 
-.OrgUnitContainer .ou-item.selected {
-    color: blue !important; /* Change the text color to blue */
-    background-color: transparent !important; /* Remove any background color */
-}
+
+/* .OrgUnitContainer span.selected  {
+    background-color: blue !important;
+} */
+.checked {
+    background-color: blue !important;
+  }
 
 .programAttributeEmptyContainer {
     width: 100%;
@@ -125,6 +198,15 @@
     align-items: center;
 }
 
+.updateSaveProgramAttributeBtn {
+
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: center;
+     
+                                                       
+}
 .sidenav a {
     padding: 10px 8px 10px 16px;
     text-decoration: none;
@@ -157,4 +239,40 @@ footer {
     width: 18px;
     /* height: 12px   */
   }
+
+  .dataTableProjectAttributes {
+    width: 30vw;
+  }
   
+  .searchResultPage {
+    justify-content: center;
+    padding: 0 10%;
+    background-color: #efefef;
+    margin-bottom: 50px;
+    height: 100%;
+  }
+  .searchResultPageHeader{
+    background-color: #ae0f0f;
+    height: 100%;
+  }
+  .searchResultPageControls {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center; 
+    gap: 16px;
+    margin-bottom: 24px;
+    margin-top: 70px;
+
+  }
+  .customImageContainer {
+
+    cursor: pointer; 
+  }
+
+
+.iconAddNewProject {
+  color: #efefef; 
+  padding-top: 10px;
+
+  
+}

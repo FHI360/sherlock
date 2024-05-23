@@ -18,7 +18,7 @@ const query = {
 }
 
 
-const OrganisationUnitComponent = ({ handleOUChange, selectedOU }) => {
+const OrganisationUnitComponent = ({ handleOUChange, selectedOU, storedOU }) => {
     const [isSearchVisible, setSearchVisible] = useState(false);
     const { loading, error, data } = useDataQuery(query)
     const toggleSearch = () => {
@@ -56,9 +56,12 @@ const OrganisationUnitComponent = ({ handleOUChange, selectedOU }) => {
                 <OrganisationUnitTree
                     name={data['results']['organisationUnits'][0]['name']}
                     onChange={handleOUChange}
+                    // initiallyExpanded={storedOU}
                     roots={[data['results']['organisationUnits'][0]['id']]}
                     selected={selectedOU}
-                    singleSelection
+                    // singleSelection
+                    className={classes.checked} // Add a class to the OrganisationUnitTree component
+
                     // disableSelection 
                 />
 

@@ -5,11 +5,29 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2024-05-07T10:38:21.759Z\n"
-"PO-Revision-Date: 2024-05-07T10:38:21.761Z\n"
+"POT-Creation-Date: 2024-05-15T16:52:23.421Z\n"
+"PO-Revision-Date: 2024-05-15T16:52:23.423Z\n"
 
-msgid "Hello {{name}}"
-msgstr "Hello {{name}}"
+msgid "Select program"
+msgstr "Select program"
 
-msgid "Sherlock"
-msgstr "Sherlock"
+msgid "Sherlock will search for matches or near matches of the program attributes"
+msgstr "Sherlock will search for matches or near matches of the program attributes"
+
+msgid "Find Duplicates"
+msgstr "Find Duplicates"
+
+msgid "Max of 5"
+msgstr "Max of 5"
+
+msgid "Add or Remove Attribute in Duplicate Checker"
+msgstr "Add or Remove Attribute in Duplicate Checker"
+
+msgid "Attribute Name"
+msgstr "Attribute Name"
+
+msgid "Priority"
+msgstr "Priority"
+
+msgid "{{displayName}}"
+msgstr "{{displayName}}"

@@ -1,6 +1,7 @@
 import { useDataQuery } from '@dhis2/app-runtime'
-import {useState, useEffect } from 'react';
 import React from 'react'
+import {useContext } from 'react';  
+import { SharedStateContext } from '../utils'
 import classes from '../App.module.css'
 import { SingleSelect, SingleSelectOption, SingleSelectField  } from '@dhis2-ui/select'
 
@@ -15,7 +16,8 @@ const query = {
     }
 }
 
-const ProgramComponent = ({ selectedOU, selectedProgram, setSelectedProgram, setSelectedProgramName }) => {
+const ProgramComponent = ({ selectedProgram, setSelectedProgram, setSelectedProgramName, setDataStoreProfile }) => {
+    const sharedState = useContext(SharedStateContext)
 
     const { loading: loading, error: error, data: data } = useDataQuery(query);
 
@@ -28,16 +30,17 @@ const ProgramComponent = ({ selectedOU, selectedProgram, setSelectedProgram, set
     }
 
     const handleProgramChange = event => {
-
+        sharedState.setSelectedSharedOU([])
+        sharedState.setSelectedSharedAttr([])
+        sharedState.setSelectedSharedProgram([])
+        sharedState.setFullOrgUnitSharedSearch(false)
+        setDataStoreProfile(false)
         setSelectedProgram(event.selected);
         {data.programsMetadata.programs.filter(programs => programs.id.includes(event.selected)).map(
           ({ id, displayName }) => (                    
               setSelectedProgramName({displayName})                   
                                    )
           )}
-
-          
-
     };
 
 return(
