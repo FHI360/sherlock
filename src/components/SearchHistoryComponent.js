@@ -30,6 +30,7 @@ import {
 export const SearchHistoryComponent = () => {
 
     const [dataItems, setDataItems] = useState([])
+    const [dataItemsToggle, setDataItemsToggle] = useState([])
     const sharedState = useContext(SharedStateContext)
     const navigate = useNavigate();
     const engine = useDataEngine();
@@ -44,8 +45,10 @@ export const SearchHistoryComponent = () => {
 
 
 
+
     useEffect(() => {
 
+        refetchExistingRecords()
         if(ExistingRecords){
             const searchHistoryList = ExistingRecords?.dataStore?.entries || [];
             // const searchHistoryList = ExistingRecords.dataStore?.entries.filter(entry => entry.programid === selectedSharedProgram) || [];
@@ -53,7 +56,7 @@ export const SearchHistoryComponent = () => {
             setDataItems(searchHistoryList)
 
         }
-    },[ExistingRecords])
+    },[ExistingRecords, refetchExistingRecords,dataItemsToggle])
   
 
     const launchSearch = async (projectName) => {
@@ -72,6 +75,7 @@ export const SearchHistoryComponent = () => {
     const deleteSearch = async (projectName) => {
         deleteObjects(engine, config.dataStoreSearchHistory, projectName, 'Search History Object')
         refetchExistingRecords()
+        setDataItemsToggle((prev)=> !prev)
         
     }
 

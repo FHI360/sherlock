@@ -166,3 +166,20 @@ export const useSharedState = () => {
     setSelectedSharedOUforQuery
   }
 }
+
+export const tablePager = (data, page, pageSize) => {
+
+  let pageCount = Math.ceil(data.length / pageSize);
+  let total =  data.length;
+
+  return
+  {
+      page,
+      pageSize,
+      pageCount,
+      total,
+      onPageChange,
+      onPageSizeChange,
+      pageData
+  }
+}

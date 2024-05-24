@@ -4,6 +4,7 @@ import { SharedStateContext, createOrUpdateDataStore, generateRandomId, modified
 import { config, SearchHistory} from '../consts'
 import classes from '../App.module.css'
 import { IconSave24 } from '@dhis2/ui-icons'
+import { Pagination } from '@dhis2/ui'
 
 import {
     DataTable,
@@ -37,6 +38,15 @@ export const SearchWorkerComponent = () => {
     const [dataItems, setDataItems] = useState([])
     const [searchName, setSearchName] = useState('')
     const [modalSaveSearch, setShowModalSaveSearch] = useState(false)
+
+    const [page, setPage] = useState(1)
+    const [pageCount, setPageCount] = useState(1)
+    const [pageSize, setPageSize] = useState(200)
+    const [pageTotal, setPageTotal] = useState(0)
+
+
+
+
     const [scrollHeight, setScrollHeight] = useState('350px');
     
     const sharedState = useContext(SharedStateContext)
@@ -69,6 +79,9 @@ export const SearchWorkerComponent = () => {
                 ou: joinedString,
                 program: selectedSharedProgram,
                 fields: "trackedEntityInstance, attributes",
+                // skipPaging:true,
+                pageSize:'499',
+                page:1
             }),
         },
     }
@@ -77,10 +90,12 @@ export const SearchWorkerComponent = () => {
 
 
     useEffect(() => {
+        console.log(data)
 
         if(data){
             const teis = data?.targetedEntity?.trackedEntityInstances || []
             console.log(teis)
+            console.log(teis.length)
             setDataItems(teis)
             // if (teis.length > 0){
             //     const selectedHeaders = selectedSharedAttr.map(attr => ({
@@ -178,12 +193,21 @@ export const SearchWorkerComponent = () => {
         setShowModalSaveSearch(false);
     };
 
-    // console.log(dataItems.length)
+    const logOnPageChange = () => {
+
+        console.log('logOnPageChange')
+    }
+
+    const logOnPageSizeChange = () => {
+        console.log('logOnPageSizeChange')
+
+    }
+
 
     return(
-        <div className={classes.searchResultPage}       >
+        <div className={classes.searchResultPage}       > 
 
-             <div className={classes.searchResultPageControls}>
+             <div className={`${classes.searchResultPageControls}`}>
              <Button
                 primary
                 onClick={() => {
@@ -198,7 +222,20 @@ export const SearchWorkerComponent = () => {
              </div>
             <div>
      
-                <DataTable scrollHeight={scrollHeight}>
+            <Pagination
+                onPageChange={logOnPageChange}
+                onPageSizeChange={logOnPageSizeChange}
+                // page={page}
+                // pageCount={pageCount}
+                // pageSize={pageSize}
+                // total={pageTotal}
+                page={10}
+                pageCount={21}
+                pageSize={50}
+                total={1035}
+
+            />
+                <DataTable scrollHeight={scrollHeight} className={`${classes.dataTableMargin}`}>
                     {dataItems && dataItems.length> 0 && <TableHead large={true}>
                     <DataTableRow>
                             <DataTableColumnHeader  fixed top="0" />
@@ -217,8 +254,40 @@ export const SearchWorkerComponent = () => {
                                 <DataTableRow key={instance.trackedEntityInstance} 
                                                 expandableContent={<div 
                                                     style={{backgroundColor: 'lightblue', margin: 8, padding: 4}}>
-                                                        More info about this row!
-                                                    </div>}
+                                                        
+                                                        
+                                                        <Pagination
+                                                            // onPageChange={logOnPageChange}
+                                                            // onPageSizeChange={logOnPageSizeChange}
+                                                            page={10}
+                                                            pageCount={21}
+                                                            pageSize={50}
+                                                            total={1035}
+                                                        />
+                                                        <DataTable scrollHeight={scrollHeight} className={`${classes.dataTableMargin}`}>
+                                                        <TableHead large={true}>
+                                                        <DataTableRow>
+                                                                    
+                                                                        {selectedSharedAttr.map(header => (
+                                                                            <DataTableColumnHeader key={header.id} fixed top="0">
+                                                                                    {header.displayName.replace(selectedSharedProgramName.displayName + ' ', '')}
+                                                                            </DataTableColumnHeader>
+                                                                        )) || []}
+                                                                        <DataTableColumnHeader  fixed top="0">Score</DataTableColumnHeader>
+
+                                                            </DataTableRow>
+
+                                                        </TableHead>
+                                                        <DataTableBody>
+                                                            <DataTableRow>
+
+                                                                
+                                                            </DataTableRow>
+                                                        </DataTableBody>
+                                                        </DataTable>
+                                                        
+                                                        
+                                                        </div>}
                                                 expanded={selectedRow.some(item => item === instance.trackedEntityInstance)}
                                                 onExpandToggle={() => {
                                                     onExpandToggle(instance.trackedEntityInstance)
