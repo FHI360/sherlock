@@ -34,6 +34,7 @@ export const SearchWorkerComponent = () => {
 
     const [headers, setHeaders] = useState([])
     const [selectedRow, setSelectedRow] = useState([])
+    const threshold = 0.6
 
 
     const [dataItems, setDataItems] = useState([])
@@ -95,7 +96,6 @@ export const SearchWorkerComponent = () => {
 
 		if (data) {
 			const teis = data?.targetedEntity?.trackedEntityInstances || []
-            console.log('teis', teis)
 
 			//Flatten TEI attributes to object attribute
 			let _data = teis.map(tei => {
@@ -135,11 +135,12 @@ export const SearchWorkerComponent = () => {
 					keys.push(k)
 				}
 			})
-            console.log('keys:', keys)
+            // console.log('keys:', keys)
 
 			const options = {
 				includeScore: true,
 				isCaseSensitive: false,
+                threshold: threshold,
 				keys: keys
 			}
 			const resultObj = [];
