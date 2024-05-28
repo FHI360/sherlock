@@ -80,7 +80,7 @@ export const SearchWorkerComponent = () => {
             params: ({ orgUnit, prog}) =>({
                 ou: joinedString,
                 program: selectedSharedProgram,
-                fields: "trackedEntityInstance, attributes",
+                fields: "trackedEntityInstance, attributes, orgUnit",
                 // skipPaging:true,
                 pageSize:'499',
                 page:1
@@ -95,6 +95,7 @@ export const SearchWorkerComponent = () => {
 
 		if (data) {
 			const teis = data?.targetedEntity?.trackedEntityInstances || []
+            console.log('teis', teis)
 
 			//Flatten TEI attributes to object attribute
 			let _data = teis.map(tei => {
@@ -134,6 +135,7 @@ export const SearchWorkerComponent = () => {
 					keys.push(k)
 				}
 			})
+            console.log('keys:', keys)
 
 			const options = {
 				includeScore: true,
@@ -181,9 +183,9 @@ export const SearchWorkerComponent = () => {
 					resultObj.push(result);
 				}
 			})
-            console.log(resultObj)
+            // console.log(resultObj)
             const filteredResults = resultObj.filter(resultObj => resultObj.matches && resultObj.matches.length > 0);
-
+            // setDataItems(resultObj)
 			setDataItems(filteredResults)
 			// if (teis.length > 0){
 			//     const selectedHeaders = selectedSharedAttr.map(attr => ({
@@ -295,7 +297,7 @@ export const SearchWorkerComponent = () => {
         
         setPageSize(pageS_ize)
         updatePageData(1, pageS_ize)
-        console.log(pageSize)
+        // console.log(pageSize)
         setFilteredData(true)
 
     }
@@ -377,7 +379,7 @@ export const SearchWorkerComponent = () => {
                                                                                     {header.displayName.replace(selectedSharedProgramName.displayName + ' ', '')}
                                                                             </DataTableColumnHeader>
                                                                         )) || []}
-                                                                        <DataTableColumnHeader  fixed top="0">Score</DataTableColumnHeader>
+                                                                        <DataTableColumnHeader  fixed top="0">Score <span> : lower score represent stronger match</span></DataTableColumnHeader>
 
                                                             </DataTableRow>
 
