@@ -1,278 +1,280 @@
 /* CSS */
 
 .container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: relative;
 }
 .containerNav {
-    margin: 1rem;
-    text-align: center;
+  margin: 1rem;
+  text-align: center;
 }
 
 .nav {
-    background-color: #DCE1EA;
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-  }
-  
-  .site-title {
-    font-size: 2rem;
-  }
-  
-  .nav ul {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-    display: flex;
-    background-color: #c1bfbf;
-    /* gap: 20rem; */
-    /* background-color: #2C6693; */
-  }
-  
-  .nav a {
-    color: white;
-    text-decoration: none;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    padding: .25rem;
-    justify-content: center; 
+  background-color: #DCE1EA;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+}
+
+.site-title {
+  font-size: 2rem;
+}
+
+.nav ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  display: flex;
+  background-color: #c1bfbf;
+  /* gap: 20rem; */
+  /* background-color: #2C6693; */
+}
+
+.nav a {
+  color: white;
+  text-decoration: none;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: .25rem;
+  justify-content: center; 
 
 
 
-  }
-  
-  .nav li {
+}
 
-    color: white;
-    height: 50px;
-    width: 200px;
-    font-size: large;
-    font-weight: bold;
+.nav li {
 
-
-  }
-
-  /* .nav ul.active {
-    background-color: #2C6693;
-  } */
-  
-  .nav li:hover {
-    background-color: #555;
-    color: white; 
-  }
-
-  .nav a:hover {
-    background-color: #555;
-    color: white; 
-  }
+  color: white;
+  height: 50px;
+  width: 200px;
+  font-size: large;
+  font-weight: bold;
 
 
-  .customLinkActive{
-    background-color: #555;
-    color: white !important;
-  }
+}
+
+/* .nav ul.active {
+  background-color: #2C6693;
+} */
+
+.nav li:hover {
+  background-color: #555;
+  color: white; 
+}
+
+.nav a:hover {
+  background-color: #555;
+  color: white; 
+}
+
+
+.customLinkActive{
+  background-color: #555;
+  color: white !important;
+}
 
 .topnav {
-    background-color: #E5E8F3;
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
+  background-color: #E5E8F3;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
 
 }
 
 
 
 .topnav a {
-    color: #2C6693;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
+  color: #2C6693;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
 }
 
 .topnav a:hover {
-    background-color: #2C6693;
-    color: #fff;
+  background-color: #2C6693;
+  color: #fff;
 }
 
 .middle {
-    display: flex;
-    margin-bottom: 50px;
-    flex-grow: 1;
-    overflow-y: auto;
+  display: flex;
+  margin-bottom: 50px;
+  flex-grow: 1;
+  overflow-y: auto;
 }
 
 .main {
-    /* margin-left: 303px; */
-    margin-left: 263px;
-    display: flex;
-    flex-grow: 1;
-    border: 1px dotted black; 
+  /* margin-left: 303px; */
+  margin-left: 263px;
+  display: flex;
+  flex-grow: 1;
+  border: 1px dotted black; 
 }
 
 .headerTitle {
-    margin-left: 266px;
-    margin-top: 50px;
+  margin-left: 266px;
+  margin-top: 50px;
 
 }
 .RuleDescription {
 
-    border: 1px solid #00796B; 
-    margin-top: 100px;
-    display: flex;
-    padding: 5px;
+  border: 1px solid #00796B; 
+  margin-top: 100px;
+  display: flex;
+  padding: 5px;
 }
 
 .panelmiddle {
-    width: 30%;
-    padding: 20px 20px 20px 20px;
-    margin: 5px;
-    border-color: black;
+  width: 30%;
+  padding: 20px 20px 20px 20px;
+  margin: 5px;
+  border-color: black;
 
-    border: 1px solid rgb(46, 44, 44); 
+  border: 1px solid rgb(46, 44, 44); 
 }
 
 .panelRight {
-    width: 70%;
-    padding: 20px 20px 20px 20px;
-    border: 1px;
-    margin: 5px;
+  width: 70%;
+  padding: 20px 20px 20px 20px;
+  border: 1px;
+  margin: 5px;
 }
 
 .sidenav {
-    background-color: #F3F3F3;
-    width: 263px;
-    position: fixed;
-    top: 100px;
-    bottom: 0px;
-    left: 0;
-    z-index: 0;
+  background-color: #F3F3F3;
+  width: 263px;
+  position: fixed;
+  top: 100px;
+  bottom: 0px;
+  left: 0;
+  z-index: 0;
 }
 
 .searchPanel {
-    background-color: #F3F3F3;
-    top: 200px;
-    bottom: 0px;
-    left: 0;
-    z-index: 0;
+  background-color: #F3F3F3;
+  top: 200px;
+  bottom: 0px;
+  left: 0;
+  z-index: 0;
 }
 
 .marginTop {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 
 .OrgUnitContainer {
-    border-color: #2C6693;
-    border: #818181;
-    color: white;
-    height: 450px; /* Set the maximum height as needed */
-    overflow-y: auto; /* Enable vertical scroll */
-    background-color: #fff;
-    border: 1px solid #ccc; /* Add border */
+  border-color: #2C6693;
+  border: #818181;
+  color: white;
+  height: 450px; /* Set the maximum height as needed */
+  overflow-y: auto; /* Enable vertical scroll */
+  background-color: #fff;
+  border: 1px solid #ccc; /* Add border */
 }
 
 
 /* .OrgUnitContainer span.selected  {
-    background-color: blue !important;
+  background-color: blue !important;
 } */
 .checked {
-    background-color: blue !important;
-  }
+  background-color: blue !important;
+}
 
 .programAttributeEmptyContainer {
-    width: 100%;
-    height: 60px;
-    background-color: #DCE1EA;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  width: 100%;
+  height: 60px;
+  background-color: #DCE1EA;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .updateSaveProgramAttributeBtn {
 
-    display: flex;
-    align-items: center;
-    width: 100%;
-    justify-content: center;
-     
-                                                       
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
+   
+                                                     
 }
 .sidenav a {
-    padding: 10px 8px 10px 16px;
-    text-decoration: none;
-    font-size: 18px;
-    color: #818181;
-    display: block;
+  padding: 10px 8px 10px 16px;
+  text-decoration: none;
+  font-size: 18px;
+  color: #818181;
+  display: block;
 }
 
 .sidenav a:hover {
-    color: #f1f1f1;
+  color: #f1f1f1;
 }
 
 footer {
-    background-color: #2C6693;
-    color: #E5E8F3;
-    text-align: center;
-    padding: 10px;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    z-index: 1000;
+  background-color: #2C6693;
+  color: #E5E8F3;
+  text-align: center;
+  padding: 10px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 1000;
 }
 
 .largeIcon {
-    width: 30px;
-    height: 26px  
-  }
+  width: 30px;
+  height: 26px  
+}
 
-  .smallIcon {
-    width: 18px;
-    /* height: 12px   */
-  }
+.smallIcon {
+  width: 18px;
+  /* height: 12px   */
+}
 
-  .dataTableProjectAttributes {
-    width: 30vw;
-  }
-  
-  .searchResultPage {
-    justify-content: center;
-    padding: 0 10%;
-    background-color: #efefef;
-    margin-bottom: 50px;
-    height: 100%;
-  }
-  .searchResultPageHeader{
-    background-color: #ae0f0f;
-    height: 100%;
-  }
-  .searchResultPageControls {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center; 
-    gap: 16px;
-    margin-bottom: 24px;
-    margin-top: 70px;
+.dataTableProjectAttributes {
+  width: 30vw;
+}
 
-  }
-  .customImageContainer {
+.searchResultPage {
+  justify-content: center;
+  padding: 0 10%;
+  background-color: #efefef;
+  margin-bottom: 50px;
+  height: 100%;
+}
+.searchResultPageHeader{
+  background-color: #ae0f0f;
+  height: 100%;
+}
+.searchResultPageControls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center; 
+  gap: 16px;
+  margin-bottom: 24px;
+  margin-top: 70px;
 
-    cursor: pointer; 
-  }
+}
+.customImageContainer {
 
+  cursor: pointer; 
+}
+.dataTableMargin{
+margin-top: 10px;
+}
 
 .iconAddNewProject {
-  color: #efefef; 
-  padding-top: 10px;
+color: #efefef; 
+padding-top: 10px;
 
-  
+
 }
