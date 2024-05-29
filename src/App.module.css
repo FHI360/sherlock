@@ -181,6 +181,11 @@
   border: 1px solid #ccc; /* Add border */
 }
 
+.disabled {
+  opacity: 0.5; /* Makes the div look faded */
+  pointer-events: none; /* Disables all mouse events on this div */
+  cursor: not-allowed; /* Shows a not-allowed cursor when hovered */
+}
 
 /* .OrgUnitContainer span.selected  {
   background-color: blue !important;
@@ -277,4 +282,35 @@ color: #efefef;
 padding-top: 10px;
 
 
+}
+
+.matchThreshold {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.threshLabel {
+  font-size: 14px;
+}
+
+.threshDescription {
+  font-size: 12px;
+  color: #666;
+  margin: 8px 0 0 0;
+}
+
+/* customStyles.css */
+.customButton {
+  background-color: #00897B;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.customButton:hover {
+  background-color: darkpurple;
 }

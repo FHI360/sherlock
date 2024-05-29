@@ -46,7 +46,7 @@ export const createOrUpdateDataStore = async (engine, postObject, store, key, mo
       type: modeType ? 'create' : 'update',
       data: postObject,
     });
-    console.log('Mutation successful:', result);
+    // console.log('Mutation successful:', result);
     return result;
   } catch (error) {
     console.error('Error creating or updating object:', error);
@@ -111,7 +111,10 @@ export const SharedStateContext = createContext({
   selectedSharedProgramName: [],
   setSelectedSharedProgramName: () => {},
   selectedOUSharedforQuery: [],
-  setSelectedSharedOUforQuery: () => {}
+  setSelectedSharedOUforQuery: () => {},
+  matchingSharedThreshold: 0.6,
+  setMatchingSharedThreshold:() => {},
+
 
 })
 
@@ -124,6 +127,8 @@ export const useSharedState = () => {
   const [selectedSharedProgramName,setSelectedSharedProgramName_] = useState([]);
   const [selectedOUSharedforQuery, setSelectedSharedOUforQuery_] = useState([]);
   const [fullOrgUnitSharedSearch, setFullOrgUnitSharedSearch_] = useState(false);
+  const [matchingSharedThreshold, setMatchingSharedThreshold_] = useState(0.6);
+  
   
   // memoizedCallbacks 
   /**
@@ -150,6 +155,9 @@ export const useSharedState = () => {
   const setFullOrgUnitSharedSearch = useCallback((data) => {
     setFullOrgUnitSharedSearch_(data)
   }, [])
+  const setMatchingSharedThreshold = useCallback((data) => {
+    setMatchingSharedThreshold_(data)
+  }, [])
 
   return {
     selectedSharedOU,
@@ -163,6 +171,8 @@ export const useSharedState = () => {
     selectedSharedProgramName,
     setSelectedSharedProgramName,
     selectedOUSharedforQuery,
-    setSelectedSharedOUforQuery
+    setSelectedSharedOUforQuery,
+    matchingSharedThreshold,
+    setMatchingSharedThreshold
   }
 }

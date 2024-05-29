@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useDataQuery, useDataEngine, useAlert} from '@dhis2/app-runtime'
+import { useDataQuery, useDataEngine, useAlert, useConfig } from '@dhis2/app-runtime'
 import { SharedStateContext, createOrUpdateDataStore, generateRandomId, modifiedDate   } from '../utils'
 import { config, SearchHistory} from '../consts'
 import classes from '../App.module.css'
 import { IconSave24 } from '@dhis2/ui-icons'
 import i18n from '@dhis2/d2-i18n'
+import { IconLaunch16, IconDelete16, IconLink16, IconThumbDown16} from '@dhis2/ui-icons'
+import { Chip } from '@dhis2-ui/chip'
 
 import {
     DataTable,
@@ -14,7 +16,7 @@ import {
     DataTableCell,
     DataTableColumnHeader,
     TableHead, TableBody,  Button,
-    Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Pagination
+    Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Pagination, Tag
   } from '@dhis2/ui'
   import { Input } from '@dhis2-ui/input'
   import Fuse from 'fuse.js';
@@ -31,11 +33,10 @@ export const SearchWorkerComponent = () => {
         ({ type }) => ({ [type]: true })
       )
     const engine = useDataEngine();
+    const { baseUrl, apiVersion } = useConfig()
 
     const [headers, setHeaders] = useState([])
     const [selectedRow, setSelectedRow] = useState([])
-    const threshold = 0.6
-
 
     const [dataItems, setDataItems] = useState([])
     const [pageData, setPageData] = useState([])
@@ -59,10 +60,10 @@ export const SearchWorkerComponent = () => {
         selectedSharedProgram,
         fullOrgUnitSharedSearch,
         selectedSharedProgramName,
-        selectedOUSharedforQuery
+        selectedOUSharedforQuery,
+        matchingSharedThreshold
       } = sharedState
     
-
 
     // console.log(pathname)
     // console.log('selectedSharedOU',selectedSharedOU)
@@ -129,7 +130,7 @@ export const SearchWorkerComponent = () => {
 
 			//Build TEI attributes for use with fuse.js
 			const keys = [];
-            console.log(_data)
+            // console.log(_data)
 			_data.map(d => Object.keys(d)).flat().forEach(k => {
 				if (k !== 'id' && k !== 'selected' && !keys.includes(k)) {
 					keys.push(k)
@@ -140,7 +141,7 @@ export const SearchWorkerComponent = () => {
 			const options = {
 				includeScore: true,
 				isCaseSensitive: false,
-                threshold: threshold,
+                threshold: matchingSharedThreshold,
 				keys: keys
 			}
 			const resultObj = [];
@@ -246,6 +247,7 @@ export const SearchWorkerComponent = () => {
 
     const saveSearchHistory = async () => {
         // const key = generateRandomId();
+        // console.log('matchingThreshold: ', matchingSharedThreshold)
 
         const projectData = {
             projectName: searchName,
@@ -254,7 +256,8 @@ export const SearchWorkerComponent = () => {
             key: searchName,
             selectedOU:selectedSharedOU,
             attributesSelected:selectedSharedAttr,
-            fullOrgUnitSearch:fullOrgUnitSharedSearch,            
+            fullOrgUnitSearch:fullOrgUnitSharedSearch,
+            matchingThreshold:matchingSharedThreshold,            
             modifiedDate:modifiedDate(),  
         };
 
@@ -268,6 +271,7 @@ export const SearchWorkerComponent = () => {
                     show({ msg: 'Search Name is not Unique :' +searchName, type: 'warning' })
                 }
                 else{
+                    show({ msg: 'Search configuration saved: ' +searchName, type: 'success' })
                     handleCloseModal();
                 }
             })
@@ -286,7 +290,7 @@ export const SearchWorkerComponent = () => {
 
     const logOnPageChange = (page_) => {
 
-        console.log('logOnPageChange', page_)
+        // console.log('logOnPageChange', page_)
         setPage(page_)
         updatePageData(page_, pageSize)
         setFilteredData(true)
@@ -294,7 +298,7 @@ export const SearchWorkerComponent = () => {
     }
 
     const logOnPageSizeChange = (pageS_ize) => {
-        console.log('logOnPageSizeChange', pageS_ize)
+        // console.log('logOnPageSizeChange', pageS_ize)
         
         setPageSize(pageS_ize)
         updatePageData(1, pageS_ize)
@@ -308,6 +312,25 @@ export const SearchWorkerComponent = () => {
         pageInternal !== page && setPage(pageInternal)
         pageSizeInternal !== pageSize && setPageSize(pageSizeInternal)
         setPageData(dataItems.slice(startIdx, startIdx + pageSizeInternal))
+    }
+
+    const ActionTEI = (tei, action)=>{
+        if (action === 'Open'){
+            console.log('Action: ', action)
+            console.log(baseUrl)
+            window.open(baseUrl +'/dhis-web-tracker-capture/index.html#/dashboard?tei=vOxUH373fy5&program=IpHINAT79UW&ou=DiszpKrYNg8', '_blank');
+
+        }
+        if (action === 'Delete'){
+            console.log('Action: ', action)
+        }
+        if (action === 'Ignore'){
+            console.log('Action: ', action)
+        }
+        if (action === 'Merge'){
+            console.log('Action: ', action)
+        }
+        console.log('tei: ', tei)
     }
 
     const filteredProjects = filteredData ? pageData : dataItems;
@@ -363,24 +386,25 @@ export const SearchWorkerComponent = () => {
                                                 expandableContent={
                                                     <div style={{backgroundColor: 'lightblue', margin: 8, padding: 4}}>
                                                         
-                                                        <Pagination
+                                                        {/* <Pagination
                                                             // onPageChange={logOnPageChange}
                                                             // onPageSizeChange={logOnPageSizeChange}
                                                             page={10}
                                                             pageCount={21}
                                                             pageSize={50}
                                                             total={1035}
-                                                        />
+                                                        /> */}
                                                         <DataTable scrollHeight={scrollHeight} className={`${classes.dataTableMargin}`}>
                                                         <TableHead large={true}>
                                                         <DataTableRow>
                                                                     
                                                                         {selectedSharedAttr.map(header => (
                                                                             <DataTableColumnHeader key={header.id} fixed top="0">
-                                                                                    {header.displayName.replace(selectedSharedProgramName.displayName + ' ', '')}
+                                                                                    {i18n.t(header.displayName.replace(selectedSharedProgramName.displayName + ' ', ''))}
                                                                             </DataTableColumnHeader>
                                                                         )) || []}
-                                                                        <DataTableColumnHeader  fixed top="0">Score <span> : lower score represent stronger match</span></DataTableColumnHeader>
+                                                                        
+                                                                        <DataTableColumnHeader  fixed top="0"> {i18n.t('Score:')} <span style={{marginLeft: '2px', fontStyle:'italic'}}> {i18n.t('lower score represents stronger match')}</span></DataTableColumnHeader>
 
                                                             </DataTableRow>
 
@@ -399,7 +423,51 @@ export const SearchWorkerComponent = () => {
                                                                                     );
                                                                             })}
                                                                                 <DataTableCell>
-                                                                                            {match.score}
+                                                                                <span>{match.score}</span>
+                                                                                <span 
+                                                                                    className={classes.customImageContainer} 
+                                                                                    onClick={() => { ActionTEI(match, 'Open')  }}
+                                                                                    style={{marginLeft: '15px'}}>         
+                                                                                    <Tag 
+                                                                                        icon={<IconLaunch16 />} 
+                                                                                    >
+                                                                                        {i18n.t('Open')}
+                                                                                    </Tag>  
+                                                                                </span>  
+                                                                                <span 
+                                                                                    className={classes.customImageContainer} 
+                                                                                    onClick={() => { ActionTEI(match, 'Delete')  }}
+                                                                                    style={{marginLeft: '5px', color: 'red'}}>         
+                                                                                    <Tag 
+                                                                                        icon={<IconDelete16 color='red' />} 
+                                                                                    >
+                                                                                        {i18n.t('Delete')}
+                                                                                    </Tag>  
+                                                                                </span>
+                                                                                <span 
+                                                                                    className={classes.customImageContainer} 
+                                                                                    onClick={() => { ActionTEI(match, 'Merge')  }}
+                                                                                    style={{marginLeft: '5px', color: 'red'}}>         
+                                                                                    <Tag 
+                                                                                        icon={<IconLink16 color='green' />} 
+                                                                                    >
+                                                                                        {i18n.t('Merge')}
+                                                                                    </Tag>  
+                                                                                </span>  
+                                                                                <span 
+                                                                                    className={classes.customImageContainer} 
+                                                                                    onClick={() => { ActionTEI(match, 'Ignore')  }}
+                                                                                    style={{marginLeft: '5px', color: 'red'}}>         
+                                                                                    <Tag 
+                                                                                        icon={<IconThumbDown16 />} 
+                                                                                    >
+                                                                                        {i18n.t('Ignore')}
+                                                                                    </Tag>  
+                                                                                </span>                                                                                       
+                                                                                              
+ 
+
+ 
                                                                                 </DataTableCell>
 
                                                                             </DataTableRow>

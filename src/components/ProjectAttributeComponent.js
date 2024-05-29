@@ -28,7 +28,8 @@ const ProjectAttributeComponent = ({
     selectedProgramID, 
     showProgramAttributes, 
     setDataStoreProfile, 
-    setSelectedOU}) => {
+    setSelectedOU,
+    extSetMatchThresh}) => {
     const { loading, error, data, refetch } = useDataQuery(query, {variables: {id: selectedProgramID}})
     
     const dataStoreQueryMore = {
@@ -74,8 +75,10 @@ const ProjectAttributeComponent = ({
                 }
                 const initialSelectedAttr = newProjects[0]?.attributesSelected || []
                 const storedOU = newProjects[0]?.selectedOU || []
+                const storedMatchingThreshold = newProjects[0]?.matchingThreshold || 0.6
                 setSelectedAttr(initialSelectedAttr);
                 setSelectedOU(storedOU);
+                extSetMatchThresh(storedMatchingThreshold)
             }
         } catch (error) {
 

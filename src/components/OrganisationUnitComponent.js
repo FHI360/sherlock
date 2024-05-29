@@ -18,7 +18,7 @@ const query = {
 }
 
 
-const OrganisationUnitComponent = ({ handleOUChange, selectedOU, storedOU }) => {
+const OrganisationUnitComponent = ({ handleOUChange, selectedOU, selectedProgramName }) => {
     const [isSearchVisible, setSearchVisible] = useState(false);
     const { loading, error, data } = useDataQuery(query)
     const toggleSearch = () => {
@@ -37,6 +37,8 @@ const OrganisationUnitComponent = ({ handleOUChange, selectedOU, storedOU }) => 
     if (data) {
     //    console.log(data)
     }
+    // console.log('selectedProgramName OU: ',selectedProgramName.length)
+    // console.log('selectedProgramName',selectedProgramName)
 
     return (
         <div>
@@ -52,7 +54,7 @@ const OrganisationUnitComponent = ({ handleOUChange, selectedOU, storedOU }) => 
                             </span>
                         )}
             </div>
-            <div className={classes.OrgUnitContainer}>
+            <div className={`${classes.OrgUnitContainer} ${selectedProgramName.length === 0 ? classes.disabled : ''}`}>
                 <OrganisationUnitTree
                     name={data['results']['organisationUnits'][0]['name']}
                     onChange={handleOUChange}
@@ -62,7 +64,7 @@ const OrganisationUnitComponent = ({ handleOUChange, selectedOU, storedOU }) => 
                     // singleSelection
                     className={classes.checked} // Add a class to the OrganisationUnitTree component
 
-                    // disableSelection 
+                    disableSelection={selectedProgramName.length === 0 || selectedProgramName === undefined} 
                 />
 
             </div>

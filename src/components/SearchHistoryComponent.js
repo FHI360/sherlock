@@ -60,12 +60,13 @@ export const SearchHistoryComponent = () => {
 
     const launchSearch = async (projectName) => {
         const selectedSearch = dataItems.filter(item => item.projectName === projectName)
-        // console.log(selectedSearch[0])
+        // console.log('selectedSearch:', selectedSearch[0])
         sharedState.setSelectedSharedOU(selectedSearch[0].selectedOU)
         sharedState.setSelectedSharedAttr(selectedSearch[0].attributesSelected)
         sharedState.setSelectedSharedProgram(selectedSearch[0].programid)
         sharedState.setFullOrgUnitSharedSearch(selectedSearch[0].fullOrgUnitSearch)
         sharedState.setSelectedSharedProgramName(selectedSearch[0].ProgramName)
+        sharedState.setMatchingSharedThreshold(selectedSearch[0]?.matchingThreshold || 0.6)
         sharedState.setSelectedSharedOUforQuery(provisionOUs(selectedSearch[0].selectedOU))
 
         navigate('/results');
@@ -127,59 +128,59 @@ export const SearchHistoryComponent = () => {
                                                     {/* {instance.selectedOU} */}
                                                     </DataTableCell>
                                                     <DataTableCell>
-                                                    <spam>{instance.modifiedDate}</spam>
+                                                    <span>{instance.modifiedDate}</span>
                                                         {/* <div style={{display: 'flex', gap:'10px'}}>
 
                                                             <spam>{instance.modifiedDate}</spam>
 
 
                                                         </div> */}
-                                                          <spam style={{marginLeft: '50px'}}>                                             
-                                                    <Chip
-                                                            className={classes.customImageContainer}
-                                                            onClick={() => { launchSearch(instance.projectName)
-                                                                
-                                                            }}
-                                                            selected
-                                                            
-                                                            >
+                                                        <span style={{marginLeft: '50px'}}>                                             
+                                                            <Chip
+                                                                    className={classes.customImageContainer}
+                                                                    onClick={() => { launchSearch(instance.projectName)
+                                                                        
+                                                                    }}
+                                                                    selected
+                                                                    
+                                                                    >
 
-                                                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                            <div>  
-                                                                <span className={classes.iconAddNewProject} style={{ marginTop: '2px' }}>
-                                                                <IconLaunch16 />
-                                                                </span>
-                                                            </div>
-                                                            <div>
-                                                                <span style={{ color: 'white', marginLeft: '5px' }}>Launch Search</span>
-                                                            </div>
-                                                            </div>
-                                                            
-                                                    </Chip>
-                                                    </spam>  
-                                                    <spam style={{marginLeft: '2px'}}>                                             
-                                                    <Chip
-                                                            className={classes.customImageContainer}
-                                                            onClick={() => { deleteSearch(instance.projectName)
-                                                                
-                                                            }}
-                                                            
-                                                            
-                                                            >
+                                                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                                    <div>  
+                                                                        <span className={classes.iconAddNewProject} style={{ marginTop: '2px' }}>
+                                                                        <IconLaunch16 />
+                                                                        </span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <span style={{ color: 'white', marginLeft: '5px' }}>Launch Search</span>
+                                                                    </div>
+                                                                    </div>
+                                                                    
+                                                            </Chip>
+                                                        </span>  
+                                                        <span style={{marginLeft: '2px'}}>                                             
+                                                            <Chip
+                                                                    className={classes.customImageContainer}
+                                                                    onClick={() => { deleteSearch(instance.projectName)
+                                                                        
+                                                                    }}
+                                                                    
+                                                                    
+                                                                    >
 
-                                                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                            <div>  
-                                                                <span className={classes.iconAddNewProject} style={{ marginTop: '2px' }}>
-                                                                <IconDelete16 color='red' />
-                                                                </span>
-                                                            </div>
-                                                            <div>
-                                                                <span style={{ color: 'red', marginLeft: '5px' }}>Delete</span>
-                                                            </div>
-                                                            </div>
-                                                            
-                                                    </Chip>
-                                                    </spam>  
+                                                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                                    <div>  
+                                                                        <span className={classes.iconAddNewProject} style={{ marginTop: '2px' }}>
+                                                                        <IconDelete16 color='red' />
+                                                                        </span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <span style={{ color: 'red', marginLeft: '5px' }}>Delete</span>
+                                                                    </div>
+                                                                    </div>
+                                                                    
+                                                            </Chip>
+                                                        </span>  
                                                         
                                                     </DataTableCell>     
                                             

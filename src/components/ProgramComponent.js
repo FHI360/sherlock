@@ -33,12 +33,13 @@ const ProgramComponent = ({ selectedProgram, setSelectedProgram, setSelectedProg
         sharedState.setSelectedSharedOU([])
         sharedState.setSelectedSharedAttr([])
         sharedState.setSelectedSharedProgram([])
+        sharedState.setMatchingSharedThreshold(0.6)
         sharedState.setFullOrgUnitSharedSearch(false)
         setDataStoreProfile(false)
         setSelectedProgram(event.selected);
         {data.programsMetadata.programs.filter(programs => programs.id.includes(event.selected)).map(
           ({ id, displayName }) => (                    
-              setSelectedProgramName({displayName})                   
+              setSelectedProgramName({displayName})
                                    )
           )}
     };
