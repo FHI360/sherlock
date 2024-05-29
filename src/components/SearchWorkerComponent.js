@@ -1,27 +1,26 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useAlert, useDataEngine, useDataQuery } from '@dhis2/app-runtime'
-import { createOrUpdateDataStore, modifiedDate, SharedStateContext } from '../utils'
-import { config } from '../consts'
+import { useDataQuery, useDataEngine, useAlert, useConfig } from '@dhis2/app-runtime'
+import { SharedStateContext, createOrUpdateDataStore, generateRandomId, modifiedDate   } from '../utils'
+import { config, SearchHistory} from '../consts'
 import classes from '../App.module.css'
 import { IconSave24 } from '@dhis2/ui-icons'
+import i18n from '@dhis2/d2-i18n'
+import { IconLaunch16, IconDelete16, IconLink16, IconThumbDown16} from '@dhis2/ui-icons'
+import { Chip } from '@dhis2-ui/chip'
 
 import {
-	Button,
-	ButtonStrip,
-	DataTable,
-	DataTableBody,
-	DataTableCell,
-	DataTableColumnHeader,
-	DataTableRow,
-	Modal,
-	ModalActions,
-	ModalContent,
-	ModalTitle,
-	Pagination,
-	TableHead
-} from '@dhis2/ui'
-import { Input } from '@dhis2-ui/input'
-import Fuse from 'fuse.js';
+    DataTable,
+    DataTableFoot,
+    DataTableBody,
+    DataTableRow,
+    DataTableCell,
+    DataTableColumnHeader,
+    TableHead, TableBody,  Button,
+    Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Pagination, Tag
+  } from '@dhis2/ui'
+  import { Input } from '@dhis2-ui/input'
+  import Fuse from 'fuse.js';
+
 
 
 //api/trackedEntityInstances.json?ou=nLbABkQlwaT&program=FVhEHQDNfxm
@@ -31,16 +30,15 @@ const _data = [];
 const _teis = [];
 
 export const SearchWorkerComponent = () => {
-	const {show} = useAlert(
-		({msg}) => msg,
-		({type}) => ({[type]: true})
-	)
-	const engine = useDataEngine();
+    const { show } = useAlert(
+        ({ msg }) => msg,
+        ({ type }) => ({ [type]: true })
+      )
+    const engine = useDataEngine();
+    const { baseUrl, apiVersion } = useConfig()
 
-	const [headers, setHeaders] = useState([])
-	const [selectedRow, setSelectedRow] = useState([])
-	const threshold = 0.6
-
+    const [headers, setHeaders] = useState([])
+    const [selectedRow, setSelectedRow] = useState([])
 
 	const [dataItems, setDataItems] = useState([])
 	const [pageData, setPageData] = useState([])
@@ -57,27 +55,29 @@ export const SearchWorkerComponent = () => {
 	const [pageTotal, setPageTotal] = useState(0)
 
 
-	const sharedState = useContext(SharedStateContext)
-	const {
-		selectedSharedOU,
-		selectedSharedAttr,
-		selectedSharedProgram,
-		fullOrgUnitSharedSearch,
-		selectedSharedProgramName,
-		selectedOUSharedforQuery
-	} = sharedState
+    const sharedState = useContext(SharedStateContext)
+    const {
+        selectedSharedOU,
+        selectedSharedAttr,
+        selectedSharedProgram,
+        fullOrgUnitSharedSearch,
+        selectedSharedProgramName,
+        selectedOUSharedforQuery,
+        matchingSharedThreshold
+      } = sharedState
+    
 
 
-	// console.log(pathname)
-	// console.log('selectedSharedOU',selectedSharedOU)
-	// console.log('selectedSharedAttr',selectedSharedAttr)
-	// console.log('selectedSharedProgram',selectedSharedProgram)
-	// console.log('fullOrgUnitSharedSearch',fullOrgUnitSharedSearch)
-	// console.log('selectedSharedProgramName',selectedSharedProgramName.displayName)
-	// console.log('selectedOUSharedforQuery',selectedOUSharedforQuery)
-
-	const joinedString = selectedOUSharedforQuery.join(';');
-	// console.log(joinedString)
+    // console.log(pathname)
+    // console.log('selectedSharedOU',selectedSharedOU)
+    // console.log('selectedSharedAttr',selectedSharedAttr)
+    // console.log('selectedSharedProgram',selectedSharedProgram)
+    // console.log('fullOrgUnitSharedSearch',fullOrgUnitSharedSearch)
+    // console.log('selectedSharedProgramName',selectedSharedProgramName.displayName)
+    // console.log('selectedOUSharedforQuery',selectedOUSharedforQuery)
+     
+    const joinedString = selectedOUSharedforQuery.join(';');
+    // console.log(joinedString)
 
 	const trackedEntityInstances = {
 		targetedEntity: {
@@ -268,172 +268,239 @@ export const SearchWorkerComponent = () => {
 
 	}
 
-	const saveSearchHistory = async () => {
-		// const key = generateRandomId();
+    const saveSearchHistory = async () => {
+        // const key = generateRandomId();
+        // console.log('matchingThreshold: ', matchingSharedThreshold)
 
-		const projectData = {
-			projectName: searchName,
-			programid: selectedSharedProgram,
-			ProgramName: selectedSharedProgramName,
-			key: searchName,
-			selectedOU: selectedSharedOU,
-			attributesSelected: selectedSharedAttr,
-			fullOrgUnitSearch: fullOrgUnitSharedSearch,
-			modifiedDate: modifiedDate(),
-		};
+        const projectData = {
+            projectName: searchName,
+            programid: selectedSharedProgram,
+            ProgramName:selectedSharedProgramName,
+            key: searchName,
+            selectedOU:selectedSharedOU,
+            attributesSelected:selectedSharedAttr,
+            fullOrgUnitSearch:fullOrgUnitSharedSearch,
+            matchingThreshold:matchingSharedThreshold,
+            modifiedDate:modifiedDate(),  
+        };
 
-		createOrUpdateDataStore(engine,
-			projectData,
-			config.dataStoreSearchHistory,
-			searchName, 'create')
-			.then(result => {
-				const objCreated = result?.httpStatusCode || ''
-				if (objCreated !== 201) {
-					show({msg: 'Search Name is not Unique :' + searchName, type: 'warning'})
-				} else {
-					handleCloseModal();
-				}
-			})
-			.catch(error => {
-					console.log(error)
-				}
-			);
+       createOrUpdateDataStore(engine, 
+            projectData, 
+            config.dataStoreSearchHistory, 
+            searchName, 'create')
+            .then(result => {
+                const objCreated = result?.httpStatusCode || ''
+                if (objCreated !== 201 ){
+                    show({ msg: 'Search Name is not Unique :' +searchName, type: 'warning' })
+                }
+                else{
+                    show({ msg: 'Search configuration saved: ' +searchName, type: 'success' })
+                    handleCloseModal();
+                }
+            })
+            .catch(error => {
+                console.log(error)
+            }
+        );
 
+      
+    }
 
-	}
+    const handleCloseModal = () => {
+        setSearchName('')
+        setShowModalSaveSearch(false);
+    };
 
-	const handleCloseModal = () => {
-		setSearchName('')
-		setShowModalSaveSearch(false);
-	};
+    const logOnPageChange = (page_) => {
 
-	const logOnPageChange = (page_) => {
+        // console.log('logOnPageChange', page_)
+        setPage(page_)
+        updatePageData(page_, pageSize)
+        setFilteredData(true)
 
-		console.log('logOnPageChange', page_)
-		setPage(page_)
-		updatePageData(page_, pageSize)
-		setFilteredData(true)
+    }
 
-	}
+    const logOnPageSizeChange = (pageS_ize) => {
+        // console.log('logOnPageSizeChange', pageS_ize)
+        
+        setPageSize(pageS_ize)
+        updatePageData(1, pageS_ize)
+        // console.log(pageSize)
+        setFilteredData(true)
 
-	const logOnPageSizeChange = (pageS_ize) => {
-		console.log('logOnPageSizeChange', pageS_ize)
+    }
 
-		setPageSize(pageS_ize)
-		updatePageData(1, pageS_ize)
-		// console.log(pageSize)
-		setFilteredData(true)
+    const updatePageData = (pageInternal, pageSizeInternal) => {
+        const startIdx = (pageInternal - 1) * pageSizeInternal
+        pageInternal !== page && setPage(pageInternal)
+        pageSizeInternal !== pageSize && setPageSize(pageSizeInternal)
+        setPageData(dataItems.slice(startIdx, startIdx + pageSizeInternal))
+    }
 
-	}
+    const ActionTEI = (tei, action)=>{
+        if (action === 'Open'){
+            console.log('Action: ', action)
+            console.log(baseUrl)
+            window.open(baseUrl +'/dhis-web-tracker-capture/index.html#/dashboard?tei=vOxUH373fy5&program=IpHINAT79UW&ou=DiszpKrYNg8', '_blank');
 
-	const updatePageData = (pageInternal, pageSizeInternal) => {
-		const startIdx = (pageInternal - 1) * pageSizeInternal
-		pageInternal !== page && setPage(pageInternal)
-		pageSizeInternal !== pageSize && setPageSize(pageSizeInternal)
-		setPageData(dataItems.slice(startIdx, startIdx + pageSizeInternal))
-	}
+        }
+        if (action === 'Delete'){
+            console.log('Action: ', action)
+        }
+        if (action === 'Ignore'){
+            console.log('Action: ', action)
+        }
+        if (action === 'Merge'){
+            console.log('Action: ', action)
+        }
+        console.log('tei: ', tei)
+    }
 
-	const filteredProjects = filteredData ? pageData : dataItems;
-
-
-	return (
-		<div className={classes.searchResultPage}>
-
-			<div className={classes.searchResultPageControls}>
-				<Button
-					primary
-					onClick={() => {
-						setShowModalSaveSearch(true)
-					}}
-					disabled={!(dataItems.length > 0)}
-					loading={loading}
-					icon={<IconSave24/>}
-				>
-					Save
-				</Button>
-			</div>
-			<div>
-
-				<Pagination
-					onPageChange={logOnPageChange}
-					onPageSizeChange={logOnPageSizeChange}
-					page={page}
-					pageCount={Math.ceil(dataItems.length / pageSize)}
-					pageSize={pageSize}
-					total={filteredProjects.length}
+    const filteredProjects = filteredData ? pageData : dataItems;
 
 
-				/>
-				<DataTable scrollHeight={scrollHeight} className={`${classes.dataTableMargin}`}>
-					{dataItems && dataItems.length > 0 && <TableHead large={true}>
-						<DataTableRow>
-							<DataTableColumnHeader fixed top="0"/>
-							{selectedSharedAttr.map(header => (
-								<DataTableColumnHeader key={header.id} fixed top="0">
-									{header.displayName.replace(selectedSharedProgramName.displayName + ' ', '')}
-								</DataTableColumnHeader>
-							)) || []}
+    return(
+        <div className={classes.searchResultPage}       >
+
+             <div className={classes.searchResultPageControls}>
+             <Button
+                primary
+                onClick={() => {
+                    setShowModalSaveSearch(true)
+                }} 
+                disabled={!(dataItems.length > 0)}
+                loading={loading}
+                icon={<IconSave24 />}
+                >
+                Save
+                </Button>
+             </div>
+            <div>
+
+            <Pagination
+                onPageChange={logOnPageChange}
+                onPageSizeChange={logOnPageSizeChange}
+                page={page}
+                pageCount={Math.ceil(dataItems.length / pageSize)}
+                pageSize={pageSize}
+                total={filteredProjects.length}
+                
+
+            />
+                <DataTable scrollHeight={scrollHeight} className={`${classes.dataTableMargin}`}>
+                    {dataItems && dataItems.length> 0 && <TableHead large={true}>
+                    <DataTableRow>
+                            <DataTableColumnHeader  fixed top="0" />
+                                {selectedSharedAttr.map(header => (
+                                    <DataTableColumnHeader key={header.id} fixed top="0">
+                                            {header.displayName.replace(selectedSharedProgramName.displayName + ' ', '')}
+                                    </DataTableColumnHeader>
+                                )) || []}
 
 
-						</DataTableRow>
-					</TableHead>}
-					<DataTableBody>
+                    </DataTableRow>
+                    </TableHead>}
+                        <DataTableBody>
 
-						{filteredProjects &&
-						filteredProjects.length > 0 ?
-							(filteredProjects.map(instance => (
-									<DataTableRow key={instance.trackedEntity}
-									              expandableContent={
-										              <div
-											              style={{backgroundColor: 'lightblue', margin: 8, padding: 4}}>
+                            {filteredProjects && 
+                            filteredProjects.length> 0 ? 
+                            (filteredProjects.map(instance => (
+                                <DataTableRow key={instance.trackedEntityInstance} 
+                                                expandableContent={
+                                                    <div style={{backgroundColor: 'lightblue', margin: 8, padding: 4}}>
+                                                        
+                                                        {/* <Pagination
+                                                            // onPageChange={logOnPageChange}
+                                                            // onPageSizeChange={logOnPageSizeChange}
+                                                            page={10}
+                                                            pageCount={21}
+                                                            pageSize={50}
+                                                            total={1035}
+                                                        /> */}
+                                                        <DataTable scrollHeight={scrollHeight} className={`${classes.dataTableMargin}`}>
+                                                        <TableHead large={true}>
+                                                        <DataTableRow>
 
-											              <Pagination
-												              // onPageChange={logOnPageChange}
-												              // onPageSizeChange={logOnPageSizeChange}
-												              page={10}
-												              pageCount={21}
-												              pageSize={50}
-												              total={1035}
-											              />
-											              <DataTable scrollHeight={scrollHeight}
-											                         className={`${classes.dataTableMargin}`}>
-												              <TableHead large={true}>
-													              <DataTableRow>
+                                                                        {selectedSharedAttr.map(header => (
+                                                                            <DataTableColumnHeader key={header.id} fixed top="0">
+                                                                                    {i18n.t(header.displayName.replace(selectedSharedProgramName.displayName + ' ', ''))}
+                                                                            </DataTableColumnHeader>
+                                                                        )) || []}
 
-														              {selectedSharedAttr.map(header => (
-															              <DataTableColumnHeader key={header.id} fixed
-															                                     top="0">
-																              {header.displayName.replace(selectedSharedProgramName.displayName + ' ', '')}
-															              </DataTableColumnHeader>
-														              )) || []}
-														              <DataTableColumnHeader fixed top="0">Score <span> : lower score represent stronger match</span></DataTableColumnHeader>
+                                                                        <DataTableColumnHeader  fixed top="0"> {i18n.t('Score:')} <span style={{marginLeft: '2px', fontStyle:'italic'}}> {i18n.t('lower score represents stronger match')}</span></DataTableColumnHeader>
 
-													              </DataTableRow>
+                                                            </DataTableRow>
 
-												              </TableHead>
-												              <DataTableBody>
+                                                        </TableHead>
+                                                            <DataTableBody>
+                                                            
+                                                                    {instance.matches.length > 0 && instance.matches.map(match => ( 
+                                                                            <DataTableRow key={match.trackedEntityInstance}>
 
-													              {instance.matches.length > 0 && instance.matches.map(match => (
-														              <DataTableRow key={match.trackedEntity}>
+                                                                            {selectedSharedAttr.map(attr => {
+                                                                                    const attribute = match.attributes.find(a => a.displayName === attr.displayName.replace(selectedSharedProgramName.displayName + ' ', ''));
+                                                                                    return (
+                                                                                        <DataTableCell key={attr.displayName}>
+                                                                                            {attribute ? attribute.value : ''}
+                                                                                        </DataTableCell>
+                                                                                    );
+                                                                            })}
+                                                                                <DataTableCell>
+                                                                                <span>{match.score}</span>
+                                                                                <span
+                                                                                    className={classes.customImageContainer}
+                                                                                    onClick={() => { ActionTEI(match, 'Open')  }}
+                                                                                    style={{marginLeft: '15px'}}>
+                                                                                    <Tag
+                                                                                        icon={<IconLaunch16 />}
+                                                                                    >
+                                                                                        {i18n.t('Open')}
+                                                                                    </Tag>
+                                                                                </span>
+                                                                                <span
+                                                                                    className={classes.customImageContainer}
+                                                                                    onClick={() => { ActionTEI(match, 'Delete')  }}
+                                                                                    style={{marginLeft: '5px', color: 'red'}}>
+                                                                                    <Tag
+                                                                                        icon={<IconDelete16 color='red' />}
+                                                                                    >
+                                                                                        {i18n.t('Delete')}
+                                                                                    </Tag>
+                                                                                </span>
+                                                                                <span
+                                                                                    className={classes.customImageContainer}
+                                                                                    onClick={() => { ActionTEI(match, 'Merge')  }}
+                                                                                    style={{marginLeft: '5px', color: 'red'}}>
+                                                                                    <Tag
+                                                                                        icon={<IconLink16 color='green' />}
+                                                                                    >
+                                                                                        {i18n.t('Merge')}
+                                                                                    </Tag>
+                                                                                </span>
+                                                                                <span
+                                                                                    className={classes.customImageContainer}
+                                                                                    onClick={() => { ActionTEI(match, 'Ignore')  }}
+                                                                                    style={{marginLeft: '5px', color: 'red'}}>
+                                                                                    <Tag
+                                                                                        icon={<IconThumbDown16 />}
+                                                                                    >
+                                                                                        {i18n.t('Ignore')}
+                                                                                    </Tag>
+                                                                                </span>
 
-															              {selectedSharedAttr.map(attr => {
-																              const attribute = match.attributes.find(a => a.displayName === attr.displayName.replace(selectedSharedProgramName.displayName + ' ', ''));
-																              return (
-																	              <DataTableCell key={attr.displayName}>
-																		              {attribute ? attribute.value : ''}
-																	              </DataTableCell>
-																              );
-															              })}
-															              <DataTableCell>
-																              {match.score}
-															              </DataTableCell>
-
-														              </DataTableRow>
-
-													              ))}
 
 
-													              {/*
+
+                                                                                </DataTableCell>
+
+                                                                            </DataTableRow>
+                                                                    
+                                                                    ))}
+                                                            
+
+
+
+{/* 
                                                                 {instance.matches.length > 1 ? (instance.matches.map((matchedItem) => (
                                                                                 matchedItem.attributes.map((matches) => (  <DataTableCell>{matches.value}</DataTableCell> ))
                                                                             )                                                                
@@ -443,46 +510,46 @@ export const SearchWorkerComponent = () => {
                                                                         <DataTableCell colSpan={selectedSharedAttr.length+1} style={{ textAlign: 'center' }}>No matches found </DataTableCell>
                                                                     )
                                                                 } */}
+                                                                
+                                                           
+                                                            </DataTableBody>
+                                                        </DataTable>
+                                                    </div>}
+                                                expanded={selectedRow.some(item => item === instance.trackedEntityInstance)}
+                                                onExpandToggle={() => {
+                                                    onExpandToggle(instance.trackedEntityInstance)
+                                                }}
+                                        
+                                        >
 
 
-												              </DataTableBody>
-											              </DataTable>
-										              </div>}
-									              expanded={selectedRow.some(item => item === instance.trackedEntity)}
-									              onExpandToggle={() => {
-										              onExpandToggle(instance.trackedEntity)
-									              }}
 
-									>
+                                            {selectedSharedAttr.length > 0 && selectedSharedAttr.map(header => {
+                                                const attribute = instance.attributes.find(attr => attr.displayName === header.displayName.replace(selectedSharedProgramName.displayName + ' ', ''));
 
+                                                return (
+                                                    <DataTableCell key={header.id} >
+                                                        {attribute ? attribute.value : ''}
+                                                    </DataTableCell>
+                                                );
+                                            })}
+                                                   
 
-										{selectedSharedAttr.length > 0 && selectedSharedAttr.map(header => {
-											const attribute = instance.attributes.find(attr => attr.displayName === header.displayName.replace(selectedSharedProgramName.displayName + ' ', ''));
+                                        </DataTableRow>
+                                    ))
+                                    
+                                    ) : (
+                                        <DataTableRow>
+                                            <DataTableCell colSpan={selectedSharedAttr.length+1} style={{ textAlign: 'center' }}>No data to display</DataTableCell>
+                                        </DataTableRow>
 
-											return (
-												<DataTableCell key={header.id}>
-													{attribute ? attribute.value : ''}
-												</DataTableCell>
-											);
-										})}
+                                    )
+                            }
+                        
 
+                        </DataTableBody>
 
-									</DataTableRow>
-								))
-
-							) : (
-								<DataTableRow>
-									<DataTableCell colSpan={selectedSharedAttr.length + 1}
-									               style={{textAlign: 'center'}}>No data to display</DataTableCell>
-								</DataTableRow>
-
-							)
-						}
-
-
-					</DataTableBody>
-
-					{/*
+{/* 
                     <DataTableFoot>
                         <DataTableRow>
                             <DataTableCell colSpan="4">
@@ -490,39 +557,39 @@ export const SearchWorkerComponent = () => {
                             </DataTableCell>
                         </DataTableRow>
                     </DataTableFoot> */}
-				</DataTable>
-			</div>
-			<div className={classes.searchResultPageControls}>
+                </DataTable>
+        </div>
+        <div className={classes.searchResultPageControls}>
 
-			</div>
-			{modalSaveSearch && (<Modal><ModalTitle>Save History</ModalTitle>
+             </div>
+        {modalSaveSearch && (<Modal><ModalTitle>Save History</ModalTitle>
+        
+        <ModalContent>
 
-				<ModalContent>
 
-
-					<Input
-						name="SearchName"
-						placeholder="Create Search"
-						value={searchName}
-						onChange={({value}) => setSearchName(value)}
-
-					/>
-				</ModalContent>
-				<ModalActions>
-					<ButtonStrip end>
-						<Button onClick={handleCloseModal}>Cancel</Button>
-						<Button
-							primary
-							onClick={saveSearchHistory}
-							disabled={(searchName.length <= 0) && (dataItems.length <= 0)}
-						>
-							Save Search
-						</Button>
-					</ButtonStrip>
-				</ModalActions>
-
-			</Modal>)}
-		</div>
-	)
+        <Input
+                              name="SearchName"
+                              placeholder="Create Search"
+                              value={searchName}
+                              onChange={({ value }) => setSearchName(value)}
+                              
+                          />
+        </ModalContent>
+        <ModalActions>
+                <ButtonStrip end>
+                    <Button onClick={handleCloseModal}>Cancel</Button>
+                    <Button 
+                      primary 
+                      onClick={saveSearchHistory}
+                      disabled={(searchName.length <= 0) && (dataItems.length <= 0)}
+                      >
+                        Save Search
+                    </Button>
+                </ButtonStrip>
+        </ModalActions>
+        
+        </Modal>)}
+        </div>
+    )
 }
 
