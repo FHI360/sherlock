@@ -200,7 +200,7 @@ export const SearchWorkerComponent = () => {
 			minMatchCharLength: 3,
 			fieldNormWeight: 2,
 			findAllMatches: true,
-			threshold: 0
+			threshold: matchingSharedThreshold
 		}
 		const resultObj = [];
 		const fuse = new Fuse(data, options)
