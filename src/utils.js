@@ -114,11 +114,11 @@ export const SharedStateContext = createContext({
   setSelectedSharedOUforQuery: () => {},
   matchingSharedThreshold: 0.6,
   setMatchingSharedThreshold:() => {},
+  matchingSharedThresholdWeight: 1e-20,
+  setMatchingSharedThresholdWeight:() => {},
 
 
 })
-
-
 
 export const useSharedState = () => {
   const [selectedSharedOU,setSelectedSharedOU_] = useState([]);
@@ -128,7 +128,7 @@ export const useSharedState = () => {
   const [selectedOUSharedforQuery, setSelectedSharedOUforQuery_] = useState([]);
   const [fullOrgUnitSharedSearch, setFullOrgUnitSharedSearch_] = useState(false);
   const [matchingSharedThreshold, setMatchingSharedThreshold_] = useState(0.6);
-  
+  const [matchingSharedThresholdWeight, setMatchingSharedThresholdWeight_] = useState(1e-20);
   
   // memoizedCallbacks 
   /**
@@ -158,6 +158,9 @@ export const useSharedState = () => {
   const setMatchingSharedThreshold = useCallback((data) => {
     setMatchingSharedThreshold_(data)
   }, [])
+  const setMatchingSharedThresholdWeight = useCallback((data) => {
+    setMatchingSharedThresholdWeight_(data)
+  }, [])
 
   return {
     selectedSharedOU,
@@ -173,6 +176,27 @@ export const useSharedState = () => {
     selectedOUSharedforQuery,
     setSelectedSharedOUforQuery,
     matchingSharedThreshold,
-    setMatchingSharedThreshold
+    setMatchingSharedThreshold,
+    matchingSharedThresholdWeight,
+    setMatchingSharedThresholdWeight
   }
+}
+
+export const delete_tei = async (engine, tei) => {
+
+  try {
+    const response = await engine.mutate({
+          resource: `trackedEntityInstances/${tei}`,
+          type: 'delete',
+      });
+      return true
+      // console.log('Delete response:', response);
+      // successMessage();
+      //handleCloseModal();
+  } catch (error) {
+      // errorMessage(error)
+      return false
+      // console.error('Error deleting Object : ' + tei, error);
+  }
+
 }

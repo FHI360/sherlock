@@ -1,12 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useDataQuery, useDataEngine, useAlert, useConfig } from '@dhis2/app-runtime'
-import { SharedStateContext, createOrUpdateDataStore, generateRandomId, modifiedDate   } from '../utils'
+import { SharedStateContext, createOrUpdateDataStore, generateRandomId, modifiedDate, delete_tei   } from '../utils'
 import { config, SearchHistory} from '../consts'
 import classes from '../App.module.css'
 import { IconSave24 } from '@dhis2/ui-icons'
 import i18n from '@dhis2/d2-i18n'
 import { IconLaunch16, IconDelete16, IconLink16, IconThumbDown16} from '@dhis2/ui-icons'
-import { Chip } from '@dhis2-ui/chip'
+import ActionConfirmation from './ActionConfirmation'
+import MergeComponent from './MergeComponent'
 
 import {
     DataTable,
@@ -39,6 +40,8 @@ export const SearchWorkerComponent = () => {
 
     const [headers, setHeaders] = useState([])
     const [selectedRow, setSelectedRow] = useState([])
+    const [selectedRowDeleted, setSelectedRowDeleted] = useState([])
+    const [selectedMergingItems, setSelectedMergingItems] = useState([])
 
 	const [dataItems, setDataItems] = useState([])
 	const [pageData, setPageData] = useState([])
@@ -50,9 +53,15 @@ export const SearchWorkerComponent = () => {
 	const [scrollHeight, setScrollHeight] = useState('350px');
 
 	const [page, setPage] = useState(1)
+    const [rendered_page, setRendered_page] = useState(1)
 	// const [pageCount, setPageCount] = useState(1)
 	const [pageSize, setPageSize] = useState(50)
-	const [pageTotal, setPageTotal] = useState(0)
+    const [rendered_pageSize, setRendered_PageSize] = useState(50)
+    const [pageTotal, setPageTotal] = useState(0)
+	const [deleteConfirmation, setDeleteConfirmation] = useState(false)
+    const [mergeAction, setMergeAction] = useState(false)
+    const [selected_tei, setSelected_tei] = useState('') 
+    const [deleted_tei, setDeletion] = useState('')
 
 
     const sharedState = useContext(SharedStateContext)
@@ -63,7 +72,8 @@ export const SearchWorkerComponent = () => {
         fullOrgUnitSharedSearch,
         selectedSharedProgramName,
         selectedOUSharedforQuery,
-        matchingSharedThreshold
+        matchingSharedThreshold,
+        matchingSharedThresholdWeight
       } = sharedState
     
 
@@ -100,9 +110,13 @@ export const SearchWorkerComponent = () => {
 	} = useDataQuery(trackedEntityInstances, {variables: {page, pageSize}})
 
 	useEffect(() => {
+        console.log('Loading Searching 1 ')
 
 		if (data) {
+
 			if (data?.targetedEntity?.instances?.length) {
+            console.log('Loading Searching 2')
+            console.log(data)
 				setPage(() => page + 1)
 				refetch({page: page, pageSize: pageSize});
 
@@ -178,7 +192,7 @@ export const SearchWorkerComponent = () => {
 	}, []);
 
 	const processData = (data, teis) => {
-		console.log('Processing', data)
+		// console.log('Processing', data)
 		//Build TEI attributes for use with fuse.js
 		const keys = [];
 		data.map(d => Object.keys(d)).flat().forEach(k => {
@@ -205,16 +219,16 @@ export const SearchWorkerComponent = () => {
 		const resultObj = [];
 		const fuse = new Fuse(data, options)
 		const matchedIds = [];
-
+        // console.log('matchingSharedThresholdWeight: ', matchingSharedThresholdWeight)
 		data.forEach(d => {
 			//Proceed to match only items that are not included in any match yet (selected)
 			if (!data.filter(_d => _d.selected).map(_d => _d.id).includes(d.id)) {
 				//Join all available TEI attributes to form search string
 				const search = keys.map(k => d[k]).join(' ');
 				const adaptedSearchTerm = search.split(' ').map(word => `${word}`).join(' | ')
-				console.log('Adapted search', adaptedSearchTerm)
-				let matches = fuse.search(adaptedSearchTerm).filter(m => m.score < 1e-20)
-				console.log('Matches', matches)
+				// console.log('Adapted search', adaptedSearchTerm)
+				let matches = fuse.search(adaptedSearchTerm).filter(m => m.score < matchingSharedThresholdWeight)
+				// console.log('Matches', matches)
 				//Filter out self from matches
 				matches = matches.filter(r => r.item.id !== d.id)
 				const result = {
@@ -281,6 +295,7 @@ export const SearchWorkerComponent = () => {
             attributesSelected:selectedSharedAttr,
             fullOrgUnitSearch:fullOrgUnitSharedSearch,
             matchingThreshold:matchingSharedThreshold,
+            matchingThresholdWeight:matchingSharedThresholdWeight,
             modifiedDate:modifiedDate(),  
         };
 
@@ -314,7 +329,7 @@ export const SearchWorkerComponent = () => {
     const logOnPageChange = (page_) => {
 
         // console.log('logOnPageChange', page_)
-        setPage(page_)
+        setRendered_page(page_)
         updatePageData(page_, pageSize)
         setFilteredData(true)
 
@@ -323,7 +338,7 @@ export const SearchWorkerComponent = () => {
     const logOnPageSizeChange = (pageS_ize) => {
         // console.log('logOnPageSizeChange', pageS_ize)
         
-        setPageSize(pageS_ize)
+        setRendered_PageSize(pageS_ize)
         updatePageData(1, pageS_ize)
         // console.log(pageSize)
         setFilteredData(true)
@@ -332,31 +347,53 @@ export const SearchWorkerComponent = () => {
 
     const updatePageData = (pageInternal, pageSizeInternal) => {
         const startIdx = (pageInternal - 1) * pageSizeInternal
-        pageInternal !== page && setPage(pageInternal)
-        pageSizeInternal !== pageSize && setPageSize(pageSizeInternal)
+        pageInternal !== rendered_page && setRendered_page(pageInternal)
+        pageSizeInternal !== rendered_pageSize && setRendered_PageSize(pageSizeInternal)
         setPageData(dataItems.slice(startIdx, startIdx + pageSizeInternal))
     }
 
-    const ActionTEI = (tei, action)=>{
+    const ActionTEI = (tei, action, orgUnit='', tei_parent='')=>{
+        setSelected_tei(tei)
         if (action === 'Open'){
-            console.log('Action: ', action)
-            console.log(baseUrl)
-            window.open(baseUrl +'/dhis-web-tracker-capture/index.html#/dashboard?tei=vOxUH373fy5&program=IpHINAT79UW&ou=DiszpKrYNg8', '_blank');
+            // console.log('Action: ', action)
+            // console.log(baseUrl)
+            window.open(baseUrl +`/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei}&program=${selectedSharedProgram}&ou=${orgUnit}`, '_blank');
 
         }
         if (action === 'Delete'){
-            console.log('Action: ', action)
+            setDeleteConfirmation(true)
+            // delete_tei(engine, tei.trackedEntity)
         }
         if (action === 'Ignore'){
             console.log('Action: ', action)
         }
         if (action === 'Merge'){
             console.log('Action: ', action)
+            // console.log('tei_child:', tei)
+            // console.log('tei_parent:', tei_parent)
+            setSelectedMergingItems({'tei_child': tei, 'tei_parent':tei_parent})
+            setMergeAction(true)
+            
         }
-        console.log('tei: ', tei)
+        // console.log('tei: ', tei)
+    }
+
+    const handleClosedDeleteConfirmationModal = ()=>{
+
+        setDeleteConfirmation(false)
+
     }
 
     const filteredProjects = filteredData ? pageData : dataItems;
+    // console.log('filteredProjects: ', filteredProjects)
+    // console.log('deleted_tei: ',selectedRowDeleted)
+    useEffect(()=>{
+            if (deleted_tei.response === 'Successfull'){
+                setSelectedRowDeleted([...selectedRowDeleted, deleted_tei.tei]);
+            }
+            // console.log('Line added')
+    },[deleted_tei])
+
 
 
     return(
@@ -380,9 +417,9 @@ export const SearchWorkerComponent = () => {
             <Pagination
                 onPageChange={logOnPageChange}
                 onPageSizeChange={logOnPageSizeChange}
-                page={page}
-                pageCount={Math.ceil(dataItems.length / pageSize)}
-                pageSize={pageSize}
+                page={rendered_page}
+                pageCount={Math.ceil(dataItems.length / rendered_pageSize)}
+                pageSize={rendered_pageSize}
                 total={filteredProjects.length}
                 
 
@@ -405,10 +442,32 @@ export const SearchWorkerComponent = () => {
                             {filteredProjects && 
                             filteredProjects.length> 0 ? 
                             (filteredProjects.map(instance => (
-                                <DataTableRow key={instance.trackedEntityInstance} 
+                                <DataTableRow key={instance.trackedEntity} 
                                                 expandableContent={
+                                                    
                                                     <div style={{backgroundColor: 'lightblue', margin: 8, padding: 4}}>
-                                                        
+                                             
+                                                            <span
+                                                                className={classes.customImageContainer}
+                                                                onClick={() => { ActionTEI(instance.trackedEntity, 'Open', instance.orgUnit)  }}
+                                                                style={{marginLeft: '15px', cursor: selectedRowDeleted.some(item => item === instance.trackedEntity) ? 'not-allowed' : 'pointer'}}>
+                                                                <Tag
+                                                                    icon={<IconLaunch16 />}
+                                                                >
+                                                                    {i18n.t('Open')}
+                                                                </Tag>
+                                                            </span>
+                                                            <span
+                                                                className={classes.customImageContainer}
+                                                                onClick={() => { ActionTEI(instance.trackedEntity, 'Delete', instance.orgUnit)  }}
+                                                                style={{marginLeft: '5px', color: 'red', cursor: selectedRowDeleted.some(item => item === instance.trackedEntity) ? 'not-allowed' : 'pointer'}}>
+                                                                <Tag
+                                                                    icon={<IconDelete16 color='red' />}
+                                                                >
+                                                                    {i18n.t('Delete')}
+                                                                </Tag>
+                                                            </span>
+                                                      
                                                         {/* <Pagination
                                                             // onPageChange={logOnPageChange}
                                                             // onPageSizeChange={logOnPageSizeChange}
@@ -435,7 +494,7 @@ export const SearchWorkerComponent = () => {
                                                             <DataTableBody>
                                                             
                                                                     {instance.matches.length > 0 && instance.matches.map(match => ( 
-                                                                            <DataTableRow key={match.trackedEntityInstance}>
+                                                                            <DataTableRow id={match.trackedEntity} key={match.trackedEntity} className={(selectedRowDeleted.some(item => item === match.trackedEntity) ? ` ${classes.deletedItem}` : '')}>
 
                                                                             {selectedSharedAttr.map(attr => {
                                                                                     const attribute = match.attributes.find(a => a.displayName === attr.displayName.replace(selectedSharedProgramName.displayName + ' ', ''));
@@ -449,8 +508,13 @@ export const SearchWorkerComponent = () => {
                                                                                 <span>{match.score}</span>
                                                                                 <span
                                                                                     className={classes.customImageContainer}
-                                                                                    onClick={() => { ActionTEI(match, 'Open')  }}
-                                                                                    style={{marginLeft: '15px'}}>
+                                                                                    onClick={() => {         
+                                                                                        if (!selectedRowDeleted.some(item => item === match.trackedEntity)) {
+                                                                                        ActionTEI(match.trackedEntity, 'Open', match.orgUnit);
+                                                                                        }  
+                                                                                    }}
+                                                                                    style={{marginLeft: '15px', cursor: selectedRowDeleted.some(item => item === match.trackedEntity) ? 'not-allowed' : 'pointer'}}
+                                                                                    disabled={selectedRowDeleted.some(item => item === match.trackedEntity)}>
                                                                                     <Tag
                                                                                         icon={<IconLaunch16 />}
                                                                                     >
@@ -459,8 +523,15 @@ export const SearchWorkerComponent = () => {
                                                                                 </span>
                                                                                 <span
                                                                                     className={classes.customImageContainer}
-                                                                                    onClick={() => { ActionTEI(match, 'Delete')  }}
-                                                                                    style={{marginLeft: '5px', color: 'red'}}>
+                                                                                    onClick={() => { 
+                                                                                        if (!selectedRowDeleted.some(item => item === match.trackedEntity)) {
+                                                                                            ActionTEI(match.trackedEntity, 'Delete', match.orgUnit);
+                                                                                            }  
+                                                                                        
+                                                                                         }}
+                                                                                        disabled={selectedRowDeleted.some(item => item === match.trackedEntity)}
+                                                                                        style={{marginLeft: '5px', color: 'red', cursor: selectedRowDeleted.some(item => item === match.trackedEntity) ? 'not-allowed' : 'pointer'}}
+                                                                                    >
                                                                                     <Tag
                                                                                         icon={<IconDelete16 color='red' />}
                                                                                     >
@@ -469,8 +540,11 @@ export const SearchWorkerComponent = () => {
                                                                                 </span>
                                                                                 <span
                                                                                     className={classes.customImageContainer}
-                                                                                    onClick={() => { ActionTEI(match, 'Merge')  }}
-                                                                                    style={{marginLeft: '5px', color: 'red'}}>
+                                                                                    onClick={() => { if (!selectedRowDeleted.some(item => item === match.trackedEntity)) {
+                                                                                        ActionTEI(match.trackedEntity, 'Merge', match.orgUnit, instance.trackedEntity);
+                                                                                        }  }}
+                                                                                            style={{marginLeft: '5px', color: 'red', cursor: selectedRowDeleted.some(item => item === match.trackedEntity) ? 'not-allowed' : 'pointer'}}
+                                                                                            disabled={selectedRowDeleted.some(item => item === match.trackedEntity)}>
                                                                                     <Tag
                                                                                         icon={<IconLink16 color='green' />}
                                                                                     >
@@ -479,8 +553,12 @@ export const SearchWorkerComponent = () => {
                                                                                 </span>
                                                                                 <span
                                                                                     className={classes.customImageContainer}
-                                                                                    onClick={() => { ActionTEI(match, 'Ignore')  }}
-                                                                                    style={{marginLeft: '5px', color: 'red'}}>
+                                                                                    onClick={() => { 
+                                                                                        if (!selectedRowDeleted.some(item => item === match.trackedEntity)) {
+                                                                                        ActionTEI(match.trackedEntity, 'Ignore', match.orgUnit);
+                                                                                        }  }}
+                                                                                            style={{marginLeft: '5px', color: 'red', cursor: selectedRowDeleted.some(item => item === match.trackedEntity) ? 'not-allowed' : 'pointer'}}
+                                                                                            disabled={selectedRowDeleted.some(item => item === match.trackedEntity)}>
                                                                                     <Tag
                                                                                         icon={<IconThumbDown16 />}
                                                                                     >
@@ -515,21 +593,45 @@ export const SearchWorkerComponent = () => {
                                                             </DataTableBody>
                                                         </DataTable>
                                                     </div>}
-                                                expanded={selectedRow.some(item => item === instance.trackedEntityInstance)}
+                                                expanded={selectedRow.some(item => item === instance.trackedEntity)}
                                                 onExpandToggle={() => {
-                                                    onExpandToggle(instance.trackedEntityInstance)
+                                                    onExpandToggle(instance.trackedEntity)
                                                 }}
                                         
                                         >
 
 
 
-                                            {selectedSharedAttr.length > 0 && selectedSharedAttr.map(header => {
+                                            {selectedSharedAttr.length > 0 && selectedSharedAttr.map((header,index) => {
                                                 const attribute = instance.attributes.find(attr => attr.displayName === header.displayName.replace(selectedSharedProgramName.displayName + ' ', ''));
 
                                                 return (
-                                                    <DataTableCell key={header.id} >
+                                                    
+                                                    <DataTableCell id={instance.trackedEntity} key={header.id} className={(selectedRowDeleted.some(item => item === instance.trackedEntity) ? ` ${classes.deletedItem}` : '')}>
                                                         {attribute ? attribute.value : ''}
+                                                        {/* {index === 0 && (
+                                                        <>
+                                                            <span
+                                                                className={classes.customImageContainer}
+                                                                // onClick={() => { ActionTEI(match, 'Open')  }}
+                                                                style={{marginLeft: '15px'}}>
+                                                                <Tag
+                                                                    icon={<IconLaunch16 />}
+                                                                >
+                                                                    {i18n.t('Open')}
+                                                                </Tag>
+                                                            </span>
+                                                            <span
+                                                                className={classes.customImageContainer}
+                                                                // onClick={() => { ActionTEI(match, 'Delete')  }}
+                                                                style={{marginLeft: '5px', color: 'red'}}>
+                                                                <Tag
+                                                                    icon={<IconDelete16 color='red' />}
+                                                                >
+                                                                    {i18n.t('Delete')}
+                                                                </Tag>
+                                                            </span>
+                                                        </>)} */}
                                                     </DataTableCell>
                                                 );
                                             })}
@@ -589,6 +691,19 @@ export const SearchWorkerComponent = () => {
         </ModalActions>
         
         </Modal>)}
+        {deleteConfirmation && <ActionConfirmation 
+                Action='Delete'     
+                title={'Delete Tracked Entity'} 
+                message={'Proceed to deletion task. Record would be removed permanently.'}
+                handleClosedConfirmationModal={handleClosedDeleteConfirmationModal} 
+                ActionFunction={delete_tei}
+                engine={engine}
+                selected_tei={selected_tei}
+                setDeletion={setDeletion}
+                
+                />}
+
+        {mergeAction && <MergeComponent setMergeAction={setMergeAction }selectedMergingItems={selectedMergingItems}/>}
         </div>
     )
 }

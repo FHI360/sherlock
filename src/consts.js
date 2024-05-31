@@ -3,8 +3,8 @@ export const config = {
     dataStoreSearchHistory: 'sherlock-search-history'
 }
 
-export const ProjectsFiltersMore = 'fields=key,projectName,programid,attributesSelected,selectedOU,fullOrgUnitSearch,matchingThreshold';
-export const SearchHistory = 'fields=key,programid,projectName,attributesSelected,fullOrgUnitSearch,modifiedDate,selectedOU,ProgramName,matchingThreshold'
+export const ProjectsFiltersMore = 'fields=key,projectName,programid,attributesSelected,selectedOU,fullOrgUnitSearch,matchingThreshold,matchingThresholdWeight';
+export const SearchHistory = 'fields=key,programid,projectName,attributesSelected,fullOrgUnitSearch,modifiedDate,selectedOU,ProgramName,matchingThreshold,matchingThresholdWeight'
 export const dataStoreQueryMore = {
     dataStore: {
         resource: `dataStore/${config.dataStoreName}?${ProjectsFiltersMore}&paging=false`,

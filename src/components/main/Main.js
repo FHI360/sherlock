@@ -50,7 +50,8 @@ export const Main = () => {
         selectedSharedProgram,
         fullOrgUnitSharedSearch,
         selectedSharedProgramName,
-        matchingSharedThreshold
+        matchingSharedThreshold,
+        matchingSharedThresholdWeight
       } = sharedState
 
     // console.log('selectedSharedOU',selectedSharedOU)
@@ -68,6 +69,8 @@ export const Main = () => {
     const [fullOrgUnitSearch, setFullOrgUnitSearch] = useState(false);
     const [selectedProgramName,setSelectedProgramName] = useState(selectedSharedProgramName?.displayName || []);
     const [matchingThreshold, extSetMatchThresh] = useState(matchingSharedThreshold);
+    const [matchingThresholdWeight, extSetMatchThreshholdWeight] = useState(matchingSharedThresholdWeight);
+
     const [showProgramAttributes, setProgramAttribute] = useState(false);
     const [showProgramAttributesExpand, setProgramAttributeExpand] = useState(true);
     const [showProgramAttributesSave, setProgramAttributeSave] = useState(false);
@@ -109,20 +112,27 @@ export const Main = () => {
             setFullOrgUnitSearch(fullOrgUnitSharedSearch)
             
         }
-        if (matchingThreshold !== null){
+        if (matchingSharedThreshold !== null){
             extSetMatchThresh(matchingSharedThreshold)
             
         }
+        if (matchingSharedThresholdWeight !== null){
+            extSetMatchThreshholdWeight(matchingSharedThresholdWeight)
+            
+        }
+
+
 
     },[])
 
     useEffect(()=> {
         sharedState.setMatchingSharedThreshold(matchingThreshold)
+        sharedState.setMatchingSharedThresholdWeight(matchingThresholdWeight)
         const checkProgrammName = selectedProgramName?.displayName || []
         if (checkProgrammName.length > 0){
             handleSaveorUpdateRecord(dataStoreProfileExist ? 'update' : 'create', selectedAttr);
         }
-    },[matchingThreshold])
+    },[matchingThreshold, matchingThresholdWeight])
     
     /***
      * Org Units Selection Function. Responsible populating OrgUnitsSelected with selected OrgUnits
@@ -167,6 +177,7 @@ export const Main = () => {
                 attributesSelected:data,
                 fullOrgUnitSearch:fullOrgUnitSearch,
                 matchingThreshold:matchingThreshold,
+                matchingThresholdWeight:matchingThresholdWeight,
                 modifiedDate:modifiedDate(),  
             };    
             try {                
@@ -187,6 +198,7 @@ export const Main = () => {
         sharedState.setSelectedSharedProgramName(selectedProgramName)
         sharedState.setSelectedSharedOUforQuery(selectedOUforQuery)
         sharedState.setMatchingSharedThreshold(matchingThreshold)
+        sharedState.setMatchingSharedThresholdWeight(matchingThresholdWeight)
         navigate('/results');
         // history.push('/edit')
     }
@@ -265,6 +277,8 @@ export const Main = () => {
                                                             selectedProgramName={selectedProgramName}
                                                             showProgramAttributesSave={showProgramAttributesSave}
                                                             selectedAttr={selectedAttr}
+                                                            matchingThresholdWeight={matchingThresholdWeight}
+                                                            extSetMatchThreshholdWeight={extSetMatchThreshholdWeight}
 
                                                             />
                                             </div>
@@ -344,6 +358,8 @@ export const Main = () => {
                                                     showProgramAttributes={showProgramAttributes}
                                                     setDataStoreProfile={setDataStoreProfile}
                                                     setSelectedOU={setSelectedOU}
+                                                    extSetMatchThreshholdWeight={extSetMatchThreshholdWeight}
+                                                    
                                                 />
                                         </div>
 

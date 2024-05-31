@@ -34,6 +34,7 @@ const ProgramComponent = ({ selectedProgram, setSelectedProgram, setSelectedProg
         sharedState.setSelectedSharedAttr([])
         sharedState.setSelectedSharedProgram([])
         sharedState.setMatchingSharedThreshold(0.6)
+        sharedState.setMatchingSharedThresholdWeight(1e-20)
         sharedState.setFullOrgUnitSharedSearch(false)
         setDataStoreProfile(false)
         setSelectedProgram(event.selected);

@@ -11,12 +11,15 @@ const ThresholdInput = ({ matchingThreshold,
                           dataStoreProfileExist, 
                           selectedProgramName, 
                           selectedAttr, 
-                          showProgramAttributesSave }) => {
+                          showProgramAttributesSave,
+                          matchingThresholdWeight, 
+                          extSetMatchThreshholdWeight }) => {
   const { show } = useAlert(
         ({ msg }) => msg,
         ({ type }) => ({ [type]: true })
       )
   const [matchThreshold, setMatchThreshold] = useState(matchingThreshold)
+  const [matchThresholdWeight, setMatchThresholdWeight] = useState(1e-20)
   const [saveThreshold, setSaveThreshold] = useState(false)
   const [checkProgrammName, setCheckProgrammName] = useState(0)
 
@@ -29,7 +32,8 @@ const ThresholdInput = ({ matchingThreshold,
     if (validateThreshold()){     
         if (dataStoreProfileExist){ 
           extSetMatchThresh(matchThreshold)
-          show({ msg: 'Matching Threshold Updated to  ' +matchThreshold, type: 'success' })          
+          extSetMatchThreshholdWeight(matchThresholdWeight)
+          show({ msg: 'Matching Threshold settings Updated', type: 'success' })          
         }
       }else{
         show({ msg: 'Matching Threshold must be between 0 to 1. Cannot be  ' +matchThreshold, type: 'warning' })
@@ -39,7 +43,8 @@ const ThresholdInput = ({ matchingThreshold,
 
   useEffect(()=>{
     setMatchThreshold(matchingThreshold)
-  },[matchingThreshold])
+    setMatchThresholdWeight(matchingThresholdWeight)
+  },[matchingThreshold, matchingThresholdWeight])
   
   const validateThreshold = () => {
     if (matchThreshold >= 0 && matchThreshold <=1){
@@ -57,32 +62,60 @@ const ThresholdInput = ({ matchingThreshold,
       {/* <label htmlFor="matchThreshold" className="threshLabel">
         Matching threshold
       </label> */}
-      <div className={classes.matchThreshold}>
-        <InputField
-          name="matchThreshold"
-          value={matchThreshold}
-          onChange={(e) => {
-                            setMatchThreshold(e.value) 
-                            }}
-          disabled={(checkProgrammName.length === 0 || selectedAttr.length === 0) || showProgramAttributesSave === true}
-          inputWidth="50px"
-        />
-        <Button disabled={(checkProgrammName.length === 0 || selectedAttr.length === 0) || showProgramAttributesSave === true} 
-        style={{ 
-                            backgroundColor: '#00897B', 
-                            color: 'white', 
-                            border: 'none', 
-                            padding: '10px 20px', 
-                            borderRadius: '5px' }} 
-        onClick={() => {                                         
-                                          setSaveThreshold((prev)=>!prev)
-                            }}>
-          Update Threshold
-        </Button>
-      </div>
-      <p className={classes.threshDescription}>{i18n.t('A value between 0 and 1 to determine auto matching, lower values require a closer match')}
-        
-      </p>
+      {checkProgrammName.length > 0 && 
+      <>
+
+                <span style={{fontSize:'14px', fontWeight:'bold'}}>{i18n.t('Threshold Parameters:')}</span> <br></br>
+
+                  
+
+        <div className={classes.thresholdPanelDescription}>
+
+            <div className={classes.matchThreshold}>
+              <InputField
+                name="matchThreshold"
+                value={matchThreshold}
+                onChange={(e) => {
+                                  setMatchThreshold(e.value) 
+                                  }}
+                disabled={(checkProgrammName.length === 0 || selectedAttr.length === 0) || showProgramAttributesSave === true}
+                inputWidth="50px"
+                helpText="Threshold"
+              />
+              <InputField
+                name="matchweight"
+                value={matchThresholdWeight}
+                onChange={(e) => {
+                      setMatchThresholdWeight(e.value) 
+                                  }}
+                disabled={(checkProgrammName.length === 0 || selectedAttr.length === 0) || showProgramAttributesSave === true}
+                inputWidth="50px"
+                helpText="Weight"
+              />
+              <Button disabled={(checkProgrammName.length === 0 || selectedAttr.length === 0) || showProgramAttributesSave === true} 
+              style={{ 
+                                  // alignContent: 'top',
+                                  backgroundColor: '#00897B', 
+                                  color: 'white', 
+                                  border: 'none', 
+                                  // padding: '10px 20px', 
+                                  borderRadius: '5px',
+                                marginBottom:'18px' }} 
+              onClick={() => {                                         
+                                                setSaveThreshold((prev)=>!prev)
+                                  }}>
+                 {i18n.t('Update Threshold Settings')}
+              </Button>
+            </div>
+
+
+        </div>
+        <p className={classes.threshDescription}>{i18n.t('A threshold value between 0 and 1 to determine auto matching, lower values require a closer match')}
+              
+              </p>
+        </>
+      }
+      
     </div>
   )
 }

@@ -127,7 +127,7 @@
 .RuleDescription {
 
   border: 1px solid #00796B; 
-  margin-top: 100px;
+  margin-top: 50px;
   display: flex;
   padding: 5px;
 }
@@ -186,12 +186,17 @@
   pointer-events: none; /* Disables all mouse events on this div */
   cursor: not-allowed; /* Shows a not-allowed cursor when hovered */
 }
+.deletedItem {
+  color: #ae0f0f !important;
+  text-decoration: line-through;
+}
 
 /* .OrgUnitContainer span.selected  {
   background-color: blue !important;
 } */
 .checked {
   background-color: blue !important;
+  color:#ae0f0f !important;
 }
 
 .programAttributeEmptyContainer {
@@ -299,6 +304,14 @@ padding-top: 10px;
   font-size: 12px;
   color: #666;
   margin: 8px 0 0 0;
+}
+
+.thresholdPanelDescription {
+
+  border: 1px solid #00796B; 
+  margin-top: 5px;
+  display: flex;
+  padding: 5px;
 }
 
 /* customStyles.css */
