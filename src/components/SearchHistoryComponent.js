@@ -1,10 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useDataQuery, useDataEngine } from '@dhis2/app-runtime'
-import { SharedStateContext, provisionOUs, deleteObjects } from '../utils'
+import { SharedStateContext, provisionOUs, deleteObjects, customImage } from '../utils'
 import classes from '../App.module.css'
 import { useNavigate } from 'react-router-dom';
 import { config, SearchHistory} from '../consts'
-
 import { IconLaunch16, IconDelete16} from '@dhis2/ui-icons'
 import { Chip } from '@dhis2-ui/chip'
 
@@ -17,7 +16,7 @@ import {
     DataTableRow,
     DataTableCell,
     DataTableColumnHeader,
-    TableHead, TableBody 
+    TableHead, TableBody , Button
   } from '@dhis2/ui'
 
 
@@ -59,14 +58,18 @@ export const SearchHistoryComponent = () => {
   
 
     const launchSearch = async (projectName) => {
+
         const selectedSearch = dataItems.filter(item => item.projectName === projectName)
-        // console.log('selectedSearch:', selectedSearch[0])
+        // console.log('selectedSearch[0]', selectedSearch[0])
+
         sharedState.setSelectedSharedOU(selectedSearch[0].selectedOU)
         sharedState.setSelectedSharedAttr(selectedSearch[0].attributesSelected)
         sharedState.setSelectedSharedProgram(selectedSearch[0].programid)
         sharedState.setFullOrgUnitSharedSearch(selectedSearch[0].fullOrgUnitSearch)
         sharedState.setSelectedSharedProgramName(selectedSearch[0].ProgramName)
         sharedState.setMatchingSharedThreshold(selectedSearch[0]?.matchingThreshold || 0.6)
+        // console.log('selectedSearch[0].matchingSharedThresholdWeight', selectedSearch[0].matchingThresholdWeight)
+        sharedState.setMatchingSharedThresholdWeight(selectedSearch[0].matchingThresholdWeight)
         sharedState.setSelectedSharedOUforQuery(provisionOUs(selectedSearch[0].selectedOU))
 
         navigate('/results');
@@ -85,7 +88,21 @@ export const SearchHistoryComponent = () => {
         <div className={classes.searchResultPage} >
             {/* style={{marginTop:'100px'}} */}
 
-            <div className={classes.searchResultPageControls}></div>
+            <div className={classes.searchResultPageControls}>
+
+                <Button
+                primary
+                onClick={() => {
+                    setDataStateChanged((prev)=>!prev)
+                }} 
+                // disabled={!(dataItems.length > 0)}
+                loading={ErrorLoadingSavedRecords}
+                icon={customImage('refresh', 'large')}
+                >
+                Refresh
+                </Button>
+
+            </div>
 
   
                 <DataTable >

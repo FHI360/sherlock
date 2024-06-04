@@ -292,7 +292,7 @@ padding-top: 10px;
 .matchThreshold {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 5px;
   margin-top: 4px;
 }
 

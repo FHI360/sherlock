@@ -1,5 +1,6 @@
 import React, { createContext,  useState, useCallback} from 'react';
 import search from './icons/search.png'
+import refresh from './icons/refresh.png'
 import classes from './App.module.css'
 
 
@@ -11,7 +12,9 @@ export const customImage = (source, size='small') => {
       if (source.toLowerCase()  === 'search'){
         return <img src={search} className={iconClass}/>
       }
-
+      if (source.toLowerCase()  === 'refresh'){
+        return <img src={refresh} className={iconClass}/>
+      }
 
 }
 
@@ -116,7 +119,8 @@ export const SharedStateContext = createContext({
   setMatchingSharedThreshold:() => {},
   matchingSharedThresholdWeight: 1e-20,
   setMatchingSharedThresholdWeight:() => {},
-
+  persistSharedData: [],
+  setPersistSharedData:() => {},
 
 })
 
@@ -129,6 +133,8 @@ export const useSharedState = () => {
   const [fullOrgUnitSharedSearch, setFullOrgUnitSharedSearch_] = useState(false);
   const [matchingSharedThreshold, setMatchingSharedThreshold_] = useState(0.6);
   const [matchingSharedThresholdWeight, setMatchingSharedThresholdWeight_] = useState(1e-20);
+  const [persistSharedData, setPersistSharedData_] = useState([]);
+  
   
   // memoizedCallbacks 
   /**
@@ -161,6 +167,9 @@ export const useSharedState = () => {
   const setMatchingSharedThresholdWeight = useCallback((data) => {
     setMatchingSharedThresholdWeight_(data)
   }, [])
+  const setPersistSharedData = useCallback((data) => {
+    setPersistSharedData_(data)
+  }, [])
 
   return {
     selectedSharedOU,
@@ -178,7 +187,9 @@ export const useSharedState = () => {
     matchingSharedThreshold,
     setMatchingSharedThreshold,
     matchingSharedThresholdWeight,
-    setMatchingSharedThresholdWeight
+    setMatchingSharedThresholdWeight,
+    persistSharedData,
+    setPersistSharedData
   }
 }
 

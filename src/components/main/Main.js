@@ -51,15 +51,19 @@ export const Main = () => {
         fullOrgUnitSharedSearch,
         selectedSharedProgramName,
         matchingSharedThreshold,
-        matchingSharedThresholdWeight
+        matchingSharedThresholdWeight,
+        persistSharedData
       } = sharedState
-
+    
+    // console.log('+++++ Main.js ++++++') 
     // console.log('selectedSharedOU',selectedSharedOU)
     // console.log('selectedSharedAttr',selectedSharedAttr)
     // console.log('selectedSharedProgram',selectedSharedProgram)
     // console.log('fullOrgUnitSharedSearch',fullOrgUnitSharedSearch)
     // console.log('selectedSharedProgramName',selectedSharedProgramName?.displayName || [])
     // console.log('matchingSharedThreshold',matchingSharedThreshold)
+    // console.log('matchingSharedThresholdWeight', matchingSharedThresholdWeight)
+    // console.log('persistSharedData', persistSharedData)
 
     const navigate = useNavigate();
 
@@ -77,6 +81,7 @@ export const Main = () => {
     const [dataStoreProfileExist, setDataStoreProfile] = useState(false);
     const [selectedOUsave, setSelectedOUSave] = useState(false);
     const [selectedOUforQuery, setSelectedOUforQuery] = useState(false);
+    const [scrollHeight, setScrollHeight] = useState('350px');
     
     // if (error) {
 
@@ -91,6 +96,28 @@ export const Main = () => {
         setSelectedOUforQuery(provisionOUs(selectedOU))
         
     }, [selectedOU]); 
+
+    useEffect(() => {
+		const adjustScrollHeight = () => {
+			const height = window.innerHeight;
+			if (height < 800) {
+				setScrollHeight('350px');
+			} else {
+				setScrollHeight('700px');
+			}
+		};
+
+		// Adjust scrollHeight initially
+		adjustScrollHeight();
+
+		// Add event listener to adjust on resize
+		window.addEventListener('resize', adjustScrollHeight);
+
+		// Clean up event listener on component unmount
+		return () => {
+			window.removeEventListener('resize', adjustScrollHeight);
+		};
+	}, []);
 
     useEffect(() => {
 
@@ -279,6 +306,7 @@ export const Main = () => {
                                                             selectedAttr={selectedAttr}
                                                             matchingThresholdWeight={matchingThresholdWeight}
                                                             extSetMatchThreshholdWeight={extSetMatchThreshholdWeight}
+                                                            scrollHeight={scrollHeight}
 
                                                             />
                                             </div>
