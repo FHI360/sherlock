@@ -1,25 +1,25 @@
+import { useDataEngine, useDataQuery } from '@dhis2/app-runtime';
 import {
-	useDataQuery
-} from '@dhis2/app-runtime';
-import {
+	Button,
+	ButtonStrip,
 	DataTable,
 	DataTableBody,
 	DataTableCell,
 	DataTableColumnHeader,
 	DataTableRow,
-	TableHead,
 	Modal,
-	ModalContent,
 	ModalActions,
-	Button,
-	ButtonStrip,
-	Radio
+	ModalContent,
+	Radio,
+	TableHead
 } from '@dhis2/ui'
 import React, { useEffect, useState } from 'react'
 import classes from '../App.module.css';
 
 
 const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
+	const engine = useDataEngine()
+
 	const [attributes, setAttributes] = useState([]);
 	const [enrollmentAttributes, setEnrollmentAttributes] = useState([]);
 	const [events, setEvents] = useState([]);
@@ -28,7 +28,16 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 	const [dataElements, setDataElements] = useState([]);
 	const [programStages, setProgramStages] = useState([]);
 	const [uids, setUids] = useState('');
-	const [stageIds, setStageIds] = useState('')
+	const [stageIds, setStageIds] = useState('');
+	const [relationships, setRelationships] = useState([]);
+
+	const trackerMutation = {
+		resource: 'tracker',
+		type: 'update',
+		data: ({payload}) => ({
+			payload
+		})
+	}
 
 	const dataElementsQuery = {
 		dataElements: {
@@ -111,6 +120,12 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 				})
 			})
 
+			//Set up default selections
+			setEvents(parentEntity.trackedEntity.enrollments[0].events);
+			setAttributes(parentEntity.trackedEntity.attributes)
+			setEnrollmentAttributes(parentEntity.trackedEntity.enrollments[0].attributes)
+			setRelationships(parentEntity.trackedEntity.relationships)
+
 			setUids(`[${de.join(',')}]`)
 			setStageIds(`[${stages.join(',')}]`)
 		}
@@ -133,6 +148,12 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 		attributes = attributes || []
 		attributes.sort((e1, e2) => e1.attribute.localeCompare(e2.attribute))
 		return attributes;
+	}
+
+	const sortedRelationships  = (relationships) => {
+		relationships = relationships || []
+		relationships.sort((e1, e2) => e1.relationship.localeCompare(e2.relationship))
+		return relationships;
 	}
 
 	const selectAttribute = (attribute, type) => {
@@ -161,6 +182,46 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 			filtered.push(event);
 			return filtered;
 		})
+	}
+
+	const selectRelationship = (relationship) => {
+		setRelationships(() => {
+			const filtered = relationships.filter(rel => rel.relationship !== relationship.relationship)
+			filtered.push(relationship);
+			return filtered;
+		})
+	}
+
+	const mergeEntities = () => {
+		const entity = parentEntity.trackedEntity;
+
+		//Filter for selected entity attributes
+		let filteredAttributes = entity.attributes.filter(attr => !attributes.find(a => a.attribute === attr.attribute));
+		filteredAttributes.push(...attributes)
+		entity.attributes = filteredAttributes;
+
+		//Filter for selected enrollment attributes
+		filteredAttributes = entity.enrollments[0].attributes.filter(attr => !enrollmentAttributes.find(a => a.attribute === attr.attribute));
+		filteredAttributes.push(...enrollmentAttributes);
+		entity.enrollments[0].attributes = filteredAttributes;
+
+		//Add selected data values
+		const filteredEvents = entity.enrollments[0].events.filter(evt => !events.find(e => e.event === evt.event))
+		filteredEvents.push(...events);
+		entity.enrollments[0].events = filteredEvents;
+
+		const payload = {
+			trackedEntities: [
+				entity,
+				{
+					trackedEntity: childEntity.trackedEntity.trackedEntity,
+					inactive: true
+				}
+			]
+		};
+
+		engine.mutate(trackerMutation, {variables: {payload}})
+		console.log('Payload', payload)
 	}
 
 	return (<>
@@ -324,7 +385,7 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 																	</DataTableCell>
 																</DataTableRow>
 																<DataTableRow>
-																	<DataTableCell colSpan={2} >
+																	<DataTableCell colSpan={2}>
 																		Data values
 																	</DataTableCell>
 																</DataTableRow>
@@ -431,6 +492,63 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 								</DataTable>
 							</DataTableCell>
 						</DataTableRow>
+						<DataTableRow>
+							<DataTableCell colSpan={2}>
+								Relationships
+							</DataTableCell>
+						</DataTableRow>
+						<DataTableRow>
+							<DataTableCell>
+								<DataTable>
+									<DataTableBody>
+										{sortedRelationships(parent?.relationships).map(rel => {
+											return (
+												<>
+													<DataTableRow>
+														<DataTableCell>
+															Name
+														</DataTableCell>
+														<DataTableCell>
+															{rel ? rel.relationshipName : ''}
+														</DataTableCell>
+														<DataTableCell>
+															<Radio
+																checked={relationships.find(a => rel.from === a.from && rel.to === a.to && rel.relationshipName === a.relationshipName)}
+																onChange={() => selectRelationship(rel)}/>
+														</DataTableCell>
+													</DataTableRow>
+												</>
+											);
+										})}
+									</DataTableBody>
+								</DataTable>
+							</DataTableCell>
+							<DataTableCell>
+								<DataTable>
+									<DataTableBody>
+										{sortedRelationships(child?.relationships).map(rel => {
+											return (
+												<>
+													<DataTableRow>
+														<DataTableCell>
+															Name
+														</DataTableCell>
+														<DataTableCell>
+															{rel ? rel.relationshipName : ''}
+														</DataTableCell>
+														<DataTableCell>
+															<Radio
+																checked={relationships.find(a => rel.from === a.from && rel.to === a.to && rel.relationshipName === a.relationshipName)}
+																onChange={() => selectRelationship(rel)}/>
+														</DataTableCell>
+													</DataTableRow>
+												</>
+											);
+										})}
+									</DataTableBody>
+								</DataTable>
+							</DataTableCell>
+						</DataTableRow>
 					</DataTableBody>
 				</DataTable>
 			</ModalContent>
@@ -439,6 +557,7 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 					<Button onClick={() => setMergeAction(false)}>Cancel</Button>
 					<Button
 						primary
+						onClick={mergeEntities}
 					>
 						Merge
 					</Button>
