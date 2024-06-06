@@ -13,7 +13,8 @@ const ThresholdInput = ({ matchingThreshold,
                           selectedAttr, 
                           showProgramAttributesSave,
                           matchingThresholdWeight, 
-                          extSetMatchThreshholdWeight }) => {
+                          extSetMatchThreshholdWeight,
+                          scrollHeight }) => {
   const { show } = useAlert(
         ({ msg }) => msg,
         ({ type }) => ({ [type]: true })
@@ -79,7 +80,7 @@ const ThresholdInput = ({ matchingThreshold,
                                   setMatchThreshold(e.value) 
                                   }}
                 disabled={(checkProgrammName.length === 0 || selectedAttr.length === 0) || showProgramAttributesSave === true}
-                inputWidth="50px"
+                inputWidth="15px"
                 helpText="Threshold"
               />
               <InputField
@@ -89,7 +90,7 @@ const ThresholdInput = ({ matchingThreshold,
                       setMatchThresholdWeight(e.value) 
                                   }}
                 disabled={(checkProgrammName.length === 0 || selectedAttr.length === 0) || showProgramAttributesSave === true}
-                inputWidth="50px"
+                inputWidth="15px"
                 helpText="Weight"
               />
               <Button disabled={(checkProgrammName.length === 0 || selectedAttr.length === 0) || showProgramAttributesSave === true} 
@@ -100,11 +101,12 @@ const ThresholdInput = ({ matchingThreshold,
                                   border: 'none', 
                                   // padding: '10px 20px', 
                                   borderRadius: '5px',
+                                  marginLeft:'5px',
                                 marginBottom:'18px' }} 
               onClick={() => {                                         
                                                 setSaveThreshold((prev)=>!prev)
                                   }}>
-                 {i18n.t('Update Threshold Settings')}
+                                    {scrollHeight === '700px' ? i18n.t('Update Threshold Settings') : i18n.t('Update')}
               </Button>
             </div>
 

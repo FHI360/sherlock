@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useDataQuery, useDataEngine, useAlert, useConfig } from '@dhis2/app-runtime'
-import { SharedStateContext, createOrUpdateDataStore, generateRandomId, modifiedDate, delete_tei   } from '../utils'
+import { SharedStateContext, createOrUpdateDataStore, generateRandomId, modifiedDate, delete_tei, customImage   } from '../utils'
 import { config, SearchHistory} from '../consts'
 import classes from '../App.module.css'
-import { IconSave24 } from '@dhis2/ui-icons'
+import { IconSave24, IconDownload24 } from '@dhis2/ui-icons'
 import i18n from '@dhis2/d2-i18n'
 import { IconLaunch16, IconDelete16, IconLink16, IconThumbDown16} from '@dhis2/ui-icons'
 import ActionConfirmation from './ActionConfirmation'
@@ -27,8 +27,22 @@ import {
 //api/trackedEntityInstances.json?ou=nLbABkQlwaT&program=FVhEHQDNfxm
 
 //&filter=lw1SqmMlnfh:GT:150:LT:190
-const _data = [];
-const _teis = [];
+let _data = [];
+let _teis = [];
+
+const trackedEntityInstances = {
+    targetedEntity: {
+        resource: 'tracker/trackedEntities',
+        params: ({pageSize, page, OUs, selectedSharedProgram}) => ({
+            orgUnit: OUs,
+            program: selectedSharedProgram,
+            fields: "trackedEntity, attributes, orgUnit",
+            // skipPaging:true,
+            pageSize: pageSize,
+            page: page
+        }),
+    },
+}
 
 export const SearchWorkerComponent = () => {
     const { show } = useAlert(
@@ -39,6 +53,8 @@ export const SearchWorkerComponent = () => {
     const { baseUrl, apiVersion } = useConfig()
 
     const [headers, setHeaders] = useState([])
+    const [filteredProjects, setFilteredProjects] = useState([])
+    
     const [selectedRow, setSelectedRow] = useState([])
     const [selectedRowDeleted, setSelectedRowDeleted] = useState([])
     const [selectedMergingItems, setSelectedMergingItems] = useState([])
@@ -46,6 +62,8 @@ export const SearchWorkerComponent = () => {
 	const [dataItems, setDataItems] = useState([])
 	const [pageData, setPageData] = useState([])
 	const [filteredData, setFilteredData] = useState(false)
+
+
 
 
 	const [searchName, setSearchName] = useState('')
@@ -62,6 +80,8 @@ export const SearchWorkerComponent = () => {
     const [mergeAction, setMergeAction] = useState(false)
     const [selected_tei, setSelected_tei] = useState('') 
     const [deleted_tei, setDeletion] = useState('')
+    const [reloadTable, setReloadTable] = useState(false)
+    const [reloadTableData, setReloadTableData] = useState(false)
 
 
     const sharedState = useContext(SharedStateContext)
@@ -73,11 +93,21 @@ export const SearchWorkerComponent = () => {
         selectedSharedProgramName,
         selectedOUSharedforQuery,
         matchingSharedThreshold,
-        matchingSharedThresholdWeight
+        matchingSharedThresholdWeight,
+        persistSharedData
       } = sharedState
     
+    //   console.log('+++++ SearchWorker.js ++++++') 
+    //   console.log('selectedSharedOU',selectedSharedOU)
+    //   console.log('selectedSharedAttr',selectedSharedAttr)
+    //   console.log('selectedSharedProgram',selectedSharedProgram)
+    //   console.log('fullOrgUnitSharedSearch',fullOrgUnitSharedSearch)
+    //   console.log('selectedSharedProgramName',selectedSharedProgramName?.displayName || [])
+    //   console.log('matchingSharedThreshold',matchingSharedThreshold)
+    //   console.log('matchingSharedThresholdWeight', matchingSharedThresholdWeight)
+    //   console.log('persistSharedData', persistSharedData)
 
-
+    const [persistData, setpersistData] = useState([])
     // console.log(pathname)
     // console.log('selectedSharedOU',selectedSharedOU)
     // console.log('selectedSharedAttr',selectedSharedAttr)
@@ -86,39 +116,35 @@ export const SearchWorkerComponent = () => {
     // console.log('selectedSharedProgramName',selectedSharedProgramName.displayName)
     // console.log('selectedOUSharedforQuery',selectedOUSharedforQuery)
      
-    const joinedString = selectedOUSharedforQuery.join(';');
-    // console.log(joinedString)
+    const OUs = selectedOUSharedforQuery.join(';');
 
-	const trackedEntityInstances = {
-		targetedEntity: {
-			resource: 'tracker/trackedEntities',
-			params: ({pageSize, page}) => ({
-				orgUnit: joinedString,
-				program: selectedSharedProgram,
-				fields: "trackedEntity, attributes, orgUnit",
-				// skipPaging:true,
-				pageSize: pageSize,
-				page: page
-			}),
-		},
-	}
+
 	const {
 		loading: loading,
 		error: error,
 		data: data,
 		refetch: refetch
-	} = useDataQuery(trackedEntityInstances, {variables: {page, pageSize}})
+	} = useDataQuery(trackedEntityInstances, {variables: {page, pageSize, OUs, selectedSharedProgram}})
 
+    useEffect(()=>{
+
+
+        refetch({page: 1, pageSize: 50, OUs: OUs, selectedSharedProgram: selectedSharedProgram});
+
+    
+    },[reloadTable])
+
+   
 	useEffect(() => {
-        console.log('Loading Searching 1 ')
-
+        // console.log('data1', data)
+        // console.log('page: ', page)
+        // console.log('pageSize: ', pageSize)
 		if (data) {
 
 			if (data?.targetedEntity?.instances?.length) {
-            console.log('Loading Searching 2')
-            console.log(data)
+
 				setPage(() => page + 1)
-				refetch({page: page, pageSize: pageSize});
+				refetch({page: page, pageSize: pageSize, OUs: OUs, selectedSharedProgram: selectedSharedProgram});
 
 
 				const teis = data?.targetedEntity?.instances || []
@@ -162,7 +188,10 @@ export const SearchWorkerComponent = () => {
 					}
 				})
 			} else {
+
 				processData(_data, _teis);
+                _data = []
+                _teis = []
 			}
 		}
 
@@ -191,9 +220,20 @@ export const SearchWorkerComponent = () => {
 		};
 	}, []);
 
+
+
+    useEffect(()=> {
+        sharedState.setPersistSharedData(persistData)
+        // console.log('persistData: ', persistData)
+
+    },[persistData])
+
+    
 	const processData = (data, teis) => {
 		// console.log('Processing', data)
 		//Build TEI attributes for use with fuse.js
+        // console.log('data3', data)
+
 		const keys = [];
 		data.map(d => Object.keys(d)).flat().forEach(k => {
 			if (k !== 'id' && k !== 'selected' && k !== 'orgUnit' && !keys.includes(k)) {
@@ -216,10 +256,14 @@ export const SearchWorkerComponent = () => {
 			findAllMatches: true,
 			threshold: matchingSharedThreshold
 		}
-		const resultObj = [];
+        // console.log(options)
+        const resultObj = []
+
 		const fuse = new Fuse(data, options)
 		const matchedIds = [];
         // console.log('matchingSharedThresholdWeight: ', matchingSharedThresholdWeight)
+        // console.log('data4: ', data)
+        // console.log('teis', teis)
 		data.forEach(d => {
 			//Proceed to match only items that are not included in any match yet (selected)
 			if (!data.filter(_d => _d.selected).map(_d => _d.id).includes(d.id)) {
@@ -258,14 +302,16 @@ export const SearchWorkerComponent = () => {
 				data = data.filter(d_ => d_.id !== d.id)
 				d.selected = true;
 				data.push(d);
-
 				resultObj.push(result);
 			}
 		})
-		const filteredResults = resultObj.filter(resultObj => resultObj.matches && resultObj.matches.length > 0);
 
-		setDataItems(filteredResults)
+        const filteredResults = resultObj.filter(resultObj => resultObj.matches && resultObj.matches.length > 0);
+        setDataItems(filteredResults)
+        setpersistData(filteredResults)
+       
 	}
+
 
 	const onExpandToggle = async (row_tei) => {
 
@@ -384,8 +430,18 @@ export const SearchWorkerComponent = () => {
 
     }
 
-    const filteredProjects = filteredData ? pageData : dataItems;
+    useEffect(()=>{
+        setFilteredProjects(filteredData ? pageData : dataItems)
+
+    },[pageData,dataItems])
+
+
+
+    // console.log('persistSharedData: ', persistSharedData)
+    // console.log('filteredData: ', filteredData)
     // console.log('filteredProjects: ', filteredProjects)
+    // console.log('pageData: ', pageData)
+    // console.log('dataItems: ', dataItems)
     // console.log('deleted_tei: ',selectedRowDeleted)
     useEffect(()=>{
             if (deleted_tei.response === 'Successfull'){
@@ -411,7 +467,20 @@ export const SearchWorkerComponent = () => {
                 >
                 Save
                 </Button>
+                {/* <Button
+                primary
+                onClick={() => {
+                    setReloadTable((prev)=>!prev)
+                }} 
+                // disabled={!(dataItems.length > 0)}
+                loading={loading}
+                icon={customImage('refresh', 'large')}
+                >
+                Refresh
+                </Button> */}
              </div>
+
+             
             <div>
 
             <Pagination
