@@ -210,6 +210,11 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 		filteredEvents.push(...events);
 		entity.enrollments[0].events = filteredEvents;
 
+		//Add selected relationship merging
+		const filteredRelationships = entity.relationships.filter(rel => !relationships.find(a => a.relationship === rel.relationship));
+		filteredRelationships.push(...relationships)
+		entity.relationships = filteredRelationships;
+
 		const payload = {
 			trackedEntities: [
 				entity,
