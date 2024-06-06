@@ -33,10 +33,11 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 
 	const trackerMutation = {
 		resource: 'tracker',
-		type: 'update',
-		data: ({payload}) => ({
-			payload
-		})
+		type: 'create',
+		params: {
+			async: false
+		},
+		data: ({payload}) => payload
 	}
 
 	const dataElementsQuery = {
@@ -121,7 +122,11 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 			})
 
 			//Set up default selections
-			setEvents(parentEntity.trackedEntity.enrollments[0].events);
+			const events = parentEntity.trackedEntity.enrollments[0].events.map(evt => {
+				evt.orgUnit = parentEntity.trackedEntity.orgUnit;
+				return evt;
+			})
+			setEvents(events);
 			setAttributes(parentEntity.trackedEntity.attributes)
 			setEnrollmentAttributes(parentEntity.trackedEntity.enrollments[0].attributes)
 			setRelationships(parentEntity.trackedEntity.relationships)
@@ -150,7 +155,7 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 		return attributes;
 	}
 
-	const sortedRelationships  = (relationships) => {
+	const sortedRelationships = (relationships) => {
 		relationships = relationships || []
 		relationships.sort((e1, e2) => e1.relationship.localeCompare(e2.relationship))
 		return relationships;
@@ -179,6 +184,9 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 			const dataValues = event.dataValues.filter(dv => dv.dataElement !== dataValue.dataElement);
 			dataValues.push(dataValue);
 			event.dataValues = dataValues;
+			if (!event.orgUnit) {
+				event.orgUnit = parent.orgUnit
+			}
 			filtered.push(event);
 			return filtered;
 		})
@@ -220,7 +228,9 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 				entity,
 				{
 					trackedEntity: childEntity.trackedEntity.trackedEntity,
-					inactive: true
+					inactive: true,
+					orgUnit: childEntity.trackedEntity.orgUnit,
+					trackedEntityType: childEntity.trackedEntity.trackedEntityType
 				}
 			]
 		};
