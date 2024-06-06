@@ -174,7 +174,7 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 
 	const selectDataValue = (event, dataValue) => {
 		setEvents(() => {
-			event = events.find(evt => evt.programStage === event.programStage) || event;
+			event = {...(events.find(evt => evt.programStage === event.programStage) || event)};
 			const filtered = events.filter(evt => evt.programStage !== event.programStage);
 			const dataValues = event.dataValues.filter(dv => dv.dataElement !== dataValue.dataElement);
 			dataValues.push(dataValue);
@@ -226,7 +226,6 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 		};
 
 		engine.mutate(trackerMutation, {variables: {payload}})
-		console.log('Payload', payload)
 	}
 
 	return (<>
