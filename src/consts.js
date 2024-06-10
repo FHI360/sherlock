@@ -16,6 +16,55 @@ export const dataStoreSearchHistoryQueryMore = {
     },
 }
 
+export const IgnoreAttrMetadata = {
+    "trackedEntityAttributes":[
+      {
+        "name": "Ignored duplicate",
+        "shortName": "Ignored duplicate",
+        "description": "sherlock duplicate ignore store",
+        "valueType": "LONG_TEXT",
+        "displayFormName": "Ignored duplicate",
+        "id": "sher1dupli1",
+        "aggregationType": "NONE",
+        "unique": false,
+        "access": {
+          "manage": true,
+          "externalize": false,
+          "write": true,
+          "read": true,
+          "update": true,
+          "delete": true
+        },
+      }
+    ]
+}
+
+export const IgnoreAttrMetadataProvisioning = {
+                        "name": "Child Programme Ignored duplicate",
+                        "program": {
+                            "id": "IpHINAT79UW"
+                        },
+                        "sortOrder": 1,
+                        "access": {
+                            "manage": true,
+                            "externalize": false,
+                            "write": true,
+                            "read": true,
+                            "update": true,
+                            "delete": true
+                        },
+                        "mandatory": false,
+                        "allowFutureDate": false,
+                        "renderOptionsAsRadio": false,
+                        "searchable": true,
+                        "valueType": "LONG_TEXT",
+                        "displayShortName": "Child Programme Ignored duplicate",
+                        "displayName": "Child Programme Ignored duplicate",
+                        "id": "sher1dupli2",
+                        "trackedEntityAttribute": {
+                            "id": "sher1dupli1"
+                        }
+}
 
 export const MainTitle = 'Sherlock'
 export const ProjectAttributedescription = 'Project Attribute'

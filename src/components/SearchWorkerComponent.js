@@ -1,13 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useDataQuery, useDataEngine, useAlert, useConfig } from '@dhis2/app-runtime'
-import { SharedStateContext, createOrUpdateDataStore, generateRandomId, modifiedDate, delete_tei, customImage   } from '../utils'
-import { config, SearchHistory} from '../consts'
+import { SharedStateContext, createOrUpdateDataStore, generateRandomId, modifiedDate, delete_tei, customImage ,createMetadata, updateTrackedEntityIgnore  } from '../utils'
+import { config, SearchHistory, IgnoreAttrMetadata, IgnoreAttrMetadataProvisioning} from '../consts'
 import classes from '../App.module.css'
 import { IconSave24, IconDownload24 } from '@dhis2/ui-icons'
 import i18n from '@dhis2/d2-i18n'
 import { IconLaunch16, IconDelete16, IconLink16, IconThumbDown16} from '@dhis2/ui-icons'
 import ActionConfirmation from './ActionConfirmation'
 import MergeComponent from './MergeComponent'
+import TrackEntityData from './TrackEntityData'
 
 import {
     DataTable,
@@ -41,6 +42,19 @@ const trackedEntityInstances = {
             pageSize: pageSize,
             page: page
         }),
+    },
+}
+
+
+
+const programs = {
+    programs: {
+        resource: 'programs',
+        id: ({ selectedSharedProgram }) => selectedSharedProgram,
+        params: {
+            // fields:['id', 'name', 'shortName', 'programType', 'programTrackedEntityAttributes'],
+            fields:'*',
+        },
     },
 }
 
@@ -78,6 +92,9 @@ export const SearchWorkerComponent = () => {
     const [pageTotal, setPageTotal] = useState(0)
 	const [deleteConfirmation, setDeleteConfirmation] = useState(false)
     const [mergeAction, setMergeAction] = useState(false)
+    const [IgnoreAction, setIgnoreAction] = useState(false)
+    const [teiUpdate, setTeiUpdate] = useState([])
+    const [trackedEntityType, setTrackedEntityType] = useState('')
     const [selected_tei, setSelected_tei] = useState('') 
     const [deleted_tei, setDeletion] = useState('')
     const [reloadTable, setReloadTable] = useState(false)
@@ -97,6 +114,8 @@ export const SearchWorkerComponent = () => {
         persistSharedData
       } = sharedState
     
+
+
     //   console.log('+++++ SearchWorker.js ++++++') 
     //   console.log('selectedSharedOU',selectedSharedOU)
     //   console.log('selectedSharedAttr',selectedSharedAttr)
@@ -126,6 +145,22 @@ export const SearchWorkerComponent = () => {
 		refetch: refetch
 	} = useDataQuery(trackedEntityInstances, {variables: {page, pageSize, OUs, selectedSharedProgram}})
 
+    const {
+		loading: loadingProgram,
+		error: errorProgram,
+		data: dataProgram,
+		refetch: refetchProgram
+	} = useDataQuery(programs, {variables: {selectedSharedProgram}})
+
+
+
+    useEffect(()=>{
+
+        if (dataProgram){
+            const IgnoreAttributeCreated =  dataProgram
+            console.log(dataProgram)
+        }
+    },[dataProgram])
     useEffect(()=>{
 
 
@@ -134,13 +169,15 @@ export const SearchWorkerComponent = () => {
     
     },[reloadTable])
 
-   
+ 
+
 	useEffect(() => {
+
         // console.log('data1', data)
         // console.log('page: ', page)
         // console.log('pageSize: ', pageSize)
 		if (data) {
-
+            console.log('data: ', data)
 			if (data?.targetedEntity?.instances?.length) {
 
 				setPage(() => page + 1)
@@ -236,11 +273,14 @@ export const SearchWorkerComponent = () => {
 
 		const keys = [];
 		data.map(d => Object.keys(d)).flat().forEach(k => {
-			if (k !== 'id' && k !== 'selected' && k !== 'orgUnit' && !keys.includes(k)) {
+			// if (k !== 'id' && k !== 'selected' && k !== 'orgUnit' && !keys.includes(k)) {
+			// 	keys.push(k)
+			// }
+            if (k !== 'id' && k !== 'selected' && k !== 'orgUnit' && !keys.includes(k)) {
 				keys.push(k)
 			}
 		})
-
+        // console.log('keys: ',keys)
 		keys.push({
 			name: 'orgUnit',
 			weight: 0.3
@@ -258,6 +298,7 @@ export const SearchWorkerComponent = () => {
 		}
         // console.log(options)
         const resultObj = []
+        // console.log(data)
 
 		const fuse = new Fuse(data, options)
 		const matchedIds = [];
@@ -307,6 +348,7 @@ export const SearchWorkerComponent = () => {
 		})
 
         const filteredResults = resultObj.filter(resultObj => resultObj.matches && resultObj.matches.length > 0);
+        // console.log('filteredResults: ', filteredResults)
         setDataItems(filteredResults)
         setpersistData(filteredResults)
        
@@ -376,7 +418,7 @@ export const SearchWorkerComponent = () => {
 
         // console.log('logOnPageChange', page_)
         setRendered_page(page_)
-        updatePageData(page_, pageSize)
+        updatePageData(page_, rendered_pageSize)
         setFilteredData(true)
 
     }
@@ -398,7 +440,7 @@ export const SearchWorkerComponent = () => {
         setPageData(dataItems.slice(startIdx, startIdx + pageSizeInternal))
     }
 
-    const ActionTEI = (tei, action, orgUnit='', tei_parent='')=>{
+    const ActionTEI = (tei, action, orgUnit='', tei_parent='', instance, match)=>{
         setSelected_tei(tei)
         if (action === 'Open'){
             // console.log('Action: ', action)
@@ -411,7 +453,8 @@ export const SearchWorkerComponent = () => {
             // delete_tei(engine, tei.trackedEntity)
         }
         if (action === 'Ignore'){
-            console.log('Action: ', action)
+            // console.log('Action: ', action)
+            handleCreateTrackedAttribute({'tei_child': match, 'tei_parent':instance})
         }
         if (action === 'Merge'){
             console.log('Action: ', action)
@@ -429,6 +472,90 @@ export const SearchWorkerComponent = () => {
         setDeleteConfirmation(false)
 
     }
+
+    const handleCreateTrackedAttribute = (teiUpdate)=>{
+        let mode = ''
+        createMetadata(engine, IgnoreAttrMetadata, mode = 'create').then(result => {
+            const objCreated = result?.httpStatusCode || ''
+            if (objCreated !== 201 ){
+                const program = selectedSharedProgramName?.displayName || []
+                const exist = dataProgram.programs.programTrackedEntityAttributes.filter(d => d.name === program +" Ignored duplicate") || []
+                let pushData = dataProgram || []
+                if (exist.length === 0){
+                    IgnoreAttrMetadataProvisioning.name = program +" Ignored duplicate";
+                    IgnoreAttrMetadataProvisioning.program.id = selectedSharedProgram;
+                    IgnoreAttrMetadataProvisioning.sortOrder = dataProgram.programs.programTrackedEntityAttributes.length + 1 || 1;
+                    IgnoreAttrMetadataProvisioning.displayShortName = program +" Ignored duplicate";
+                    IgnoreAttrMetadataProvisioning.displayName = program +" Ignored duplicate";
+    
+                    // let pushData = dataProgram || []
+                    // Append new object to programTrackedEntityAttributes array
+
+                    pushData.programs.programTrackedEntityAttributes.push(IgnoreAttrMetadataProvisioning);
+                    let provisionPushData = {"programs":[pushData.programs]}
+                    // console.log(provisionPushData)
+                    createMetadata(engine, provisionPushData, mode = 'update')
+                    .then(result => {
+                        console.log('programTrackedEntityAttributes result: ',result)
+                    })
+                    .catch(error => {
+                        console.log('programTrackedEntityAttributes error: ',error)
+                        }
+                    )
+                }
+                console.log(teiUpdate)
+                const tei_values = Object.values(teiUpdate);
+                const trackedEntityType = pushData?.programs?.trackedEntityType?.id || ''
+                setTeiUpdate(teiUpdate)
+                setTrackedEntityType(trackedEntityType)
+                setIgnoreAction(true)
+                
+                // teiUpdate.forEach((tei_value) => {
+                //     updateTrackedEntityIgnore(engine, tei_value)
+                // })
+
+
+                // const programTrackedEntityAttributes = { 
+                //     "programs":[{
+                //             "id": "IpHINAT79UW",
+                //             "programTrackedEntityAttributes":[
+                //                 {
+                //                     "name": program +" Ignored duplicate",
+                //                     "program": {
+                //                         "id": "IpHINAT79UW"
+                //                     },
+                //                     // "displayInList": true,
+                //                     "sortOrder": 1,
+                //                     "mandatory": false,
+                //                     "allowFutureDate": false,
+                //                     "renderOptionsAsRadio": false,
+                //                     "searchable": true,
+                //                     "valueType": "LONG_TEXT",
+                //                     "displayShortName": program +" Ignored duplicate",
+                //                     "displayName": program +" Ignored duplicate",
+                //                     "id": "sher1dupli2",
+                //                     "trackedEntityAttribute": {
+                //                         "id": "sher1dupli1"
+                //                     }
+                //                 }
+                //             ]
+                //     }]                   	
+                // }
+
+
+            }
+        })
+        .catch(error => {
+            console.log(error)
+            }
+        )
+
+
+
+    }
+
+    
+
 
     useEffect(()=>{
         setFilteredProjects(filteredData ? pageData : dataItems)
@@ -497,6 +624,7 @@ export const SearchWorkerComponent = () => {
                     {dataItems && dataItems.length> 0 && <TableHead large={true}>
                     <DataTableRow>
                             <DataTableColumnHeader  fixed top="0" />
+                            <DataTableColumnHeader  fixed top="0"> OrgUnit </DataTableColumnHeader>
                                 {selectedSharedAttr.map(header => (
                                     <DataTableColumnHeader key={header.id} fixed top="0">
                                             {header.displayName.replace(selectedSharedProgramName.displayName + ' ', '')}
@@ -548,6 +676,7 @@ export const SearchWorkerComponent = () => {
                                                         <DataTable scrollHeight={scrollHeight} className={`${classes.dataTableMargin}`}>
                                                         <TableHead large={true}>
                                                         <DataTableRow>
+                                                        <DataTableColumnHeader  fixed top="0"> OrgUnit </DataTableColumnHeader>
 
                                                                         {selectedSharedAttr.map(header => (
                                                                             <DataTableColumnHeader key={header.id} fixed top="0">
@@ -564,7 +693,7 @@ export const SearchWorkerComponent = () => {
                                                             
                                                                     {instance.matches.length > 0 && instance.matches.map(match => ( 
                                                                             <DataTableRow id={match.trackedEntity} key={match.trackedEntity} className={(selectedRowDeleted.some(item => item === match.trackedEntity) ? ` ${classes.deletedItem}` : '')}>
-
+                                                                            <DataTableCell>{match.orgUnit}</DataTableCell>
                                                                             {selectedSharedAttr.map(attr => {
                                                                                     const attribute = match.attributes.find(a => a.displayName === attr.displayName.replace(selectedSharedProgramName.displayName + ' ', ''));
                                                                                     return (
@@ -624,7 +753,7 @@ export const SearchWorkerComponent = () => {
                                                                                     className={classes.customImageContainer}
                                                                                     onClick={() => { 
                                                                                         if (!selectedRowDeleted.some(item => item === match.trackedEntity)) {
-                                                                                        ActionTEI(match.trackedEntity, 'Ignore', match.orgUnit);
+                                                                                        ActionTEI(match.trackedEntity, 'Ignore', match.orgUnit, instance.trackedEntity, instance, match);
                                                                                         }  }}
                                                                                             style={{marginLeft: '5px', color: 'red', cursor: selectedRowDeleted.some(item => item === match.trackedEntity) ? 'not-allowed' : 'pointer'}}
                                                                                             disabled={selectedRowDeleted.some(item => item === match.trackedEntity)}>
@@ -669,7 +798,7 @@ export const SearchWorkerComponent = () => {
                                         
                                         >
 
-
+                                                <DataTableCell>{instance.orgUnit}</DataTableCell>
 
                                             {selectedSharedAttr.length > 0 && selectedSharedAttr.map((header,index) => {
                                                 const attribute = instance.attributes.find(attr => attr.displayName === header.displayName.replace(selectedSharedProgramName.displayName + ' ', ''));
@@ -772,7 +901,8 @@ export const SearchWorkerComponent = () => {
                 
                 />}
 
-        {mergeAction && <MergeComponent setMergeAction={setMergeAction }selectedMergingItems={selectedMergingItems}/>}
+        {mergeAction && <MergeComponent setMergeAction={setMergeAction} selectedMergingItems={selectedMergingItems}/>}
+        {IgnoreAction && <TrackEntityData teiUpdate={teiUpdate} trackedEntityType={trackedEntityType} setIgnoreAction={setIgnoreAction}/>}
         </div>
     )
 }
