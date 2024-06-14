@@ -62,7 +62,7 @@ export const createMetadata = async (engine, postObject, mode)=>{
     try {
       const result = await engine.mutate({
         resource: 'metadata',
-        type: mode ? 'create' : 'update',
+        type: 'create',
         // partial: true,
         data: postObject,
       });
@@ -89,7 +89,7 @@ export const updateTrackedEntityIgnore = async (engine, teiUpdate, tei_value, pa
         "attribute": "sher1dupli1",
         "displayName": "Ignored duplicate",
         "valueType": "LONG_TEXT",
-        "value": trackedEntities.join('-')
+        "value": trackedEntities.join(';')
 
     }
 
@@ -141,6 +141,7 @@ export const updateTrackedEntityIgnore = async (engine, teiUpdate, tei_value, pa
                   resource: 'tracker',
                   type: mode ? 'create' : 'update',
                   partial: true,
+                  // async:false,
                   data : nestedPayload
 
               });

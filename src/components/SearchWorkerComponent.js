@@ -37,7 +37,7 @@ const trackedEntityInstances = {
         params: ({pageSize, page, OUs, selectedSharedProgram}) => ({
             orgUnit: OUs,
             program: selectedSharedProgram,
-            fields: "trackedEntity, attributes, orgUnit",
+            fields: ["trackedEntity, attributes, orgUnit"],
             // skipPaging:true,
             pageSize: pageSize,
             page: page
@@ -475,7 +475,9 @@ export const SearchWorkerComponent = () => {
 
     const handleCreateTrackedAttribute = (teiUpdate)=>{
         let mode = ''
+        createMetadata(engine, IgnoreAttrMetadata, mode = 'create')
         createMetadata(engine, IgnoreAttrMetadata, mode = 'create').then(result => {
+            // console.log('result: ', result)
             const objCreated = result?.httpStatusCode || ''
             if (objCreated !== 201 ){
                 const program = selectedSharedProgramName?.displayName || []

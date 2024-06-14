@@ -34,7 +34,7 @@ export const IgnoreAttrMetadata = {
           "read": true,
           "update": true,
           "delete": true
-        },
+        }
       }
     ]
 }
