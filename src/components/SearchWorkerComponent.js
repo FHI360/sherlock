@@ -23,7 +23,6 @@ import {
   import Fuse from 'fuse.js';
 
 
-
 //api/trackedEntityInstances.json?ou=nLbABkQlwaT&program=FVhEHQDNfxm
 
 //&filter=lw1SqmMlnfh:GT:150:LT:190
@@ -37,7 +36,7 @@ const trackedEntityInstances = {
             orgUnit: OUs,
             program: selectedSharedProgram,
             fields: "trackedEntity, attributes, orgUnit",
-            // skipPaging:true,
+            totalPages: true,
             pageSize: pageSize,
             page: page
         }),
@@ -64,8 +63,6 @@ export const SearchWorkerComponent = () => {
 	const [filteredData, setFilteredData] = useState(false)
 
 
-
-
 	const [searchName, setSearchName] = useState('')
 	const [modalSaveSearch, setShowModalSaveSearch] = useState(false)
 	const [scrollHeight, setScrollHeight] = useState('350px');
@@ -82,6 +79,7 @@ export const SearchWorkerComponent = () => {
     const [deleted_tei, setDeletion] = useState('')
     const [reloadTable, setReloadTable] = useState(false)
     const [reloadTableData, setReloadTableData] = useState(false)
+	const [fetching, setFetching] = useState('')
 
 
     const sharedState = useContext(SharedStateContext)
@@ -140,7 +138,15 @@ export const SearchWorkerComponent = () => {
         // console.log('page: ', page)
         // console.log('pageSize: ', pageSize)
 		if (data) {
-
+			let fetching = '';
+			const total = data.targetedEntity.total;
+			const totalFetched = page * pageSize;
+			if (totalFetched <= total) {
+				fetching = `Fetching ${totalFetched} of ${total}...`;
+			} else {
+				fetching = `Fetching ${total} of ${total}...`;
+			}
+			setFetching(fetching);
 			if (data?.targetedEntity?.instances?.length) {
 
 				setPage(() => page + 1)
@@ -188,7 +194,7 @@ export const SearchWorkerComponent = () => {
 					}
 				})
 			} else {
-
+				setFetching('');
 				processData(_data, _teis);
                 _data = []
                 _teis = []
@@ -455,19 +461,20 @@ export const SearchWorkerComponent = () => {
     return(
         <div className={classes.searchResultPage}       >
 
-             <div className={classes.searchResultPageControls}>
-             <Button
-                primary
-                onClick={() => {
-                    setShowModalSaveSearch(true)
-                }} 
-                disabled={!(dataItems.length > 0)}
-                loading={loading}
-                icon={<IconSave24 />}
-                >
-                Save
-                </Button>
-                {/* <Button
+	        <div className={classes.searchResultPageControls}>
+		        <span>{fetching}</span>
+		        <Button
+			        primary
+			        onClick={() => {
+				        setShowModalSaveSearch(true)
+			        }}
+			        disabled={!(dataItems.length > 0)}
+			        loading={loading}
+			        icon={<IconSave24/>}
+		        >
+			        Save
+		        </Button>
+		        {/* <Button
                 primary
                 onClick={() => {
                     setReloadTable((prev)=>!prev)
@@ -478,10 +485,10 @@ export const SearchWorkerComponent = () => {
                 >
                 Refresh
                 </Button> */}
-             </div>
+	        </div>
 
-             
-            <div>
+
+	        <div>
 
             <Pagination
                 onPageChange={logOnPageChange}
