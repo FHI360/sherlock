@@ -10,7 +10,7 @@ const query = {
     programsMetadata: {
         resource: 'programs',
         params: {
-            pageSize: 5,
+            // pageSize: 5,
             fields: ['id', 'displayName'],
         },
     }

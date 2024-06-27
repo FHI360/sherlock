@@ -5,33 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2024-05-29T14:57:15.066Z\n"
-"PO-Revision-Date: 2024-05-29T14:57:15.067Z\n"
-
-msgid "{{displayName}}"
-msgstr "{{displayName}}"
-
-msgid "lower score represents stronger match"
-msgstr "lower score represents stronger match"
-
-msgid "Open"
-msgstr "Open"
-
-msgid "Delete"
-msgstr "Delete"
-
-msgid "Merge"
-msgstr "Merge"
-
-msgid "Ignore"
-msgstr "Ignore"
-
-msgid ""
-"A value between 0 and 1 to determine auto matching, lower values require a "
-"closer match"
-msgstr ""
-"A value between 0 and 1 to determine auto matching, lower values require a "
-"closer match"
+"POT-Creation-Date: 2024-06-10T08:41:38.695Z\n"
+"PO-Revision-Date: 2024-06-10T08:41:38.697Z\n"
 
 msgid "Select program"
 msgstr "Select program"
@@ -53,3 +28,34 @@ msgstr "Attribute Name"
 
 msgid "Priority"
 msgstr "Priority"
+
+msgid "{{displayName}}"
+msgstr "{{displayName}}"
+
+msgid "Open"
+msgstr "Open"
+
+msgid "Delete"
+msgstr "Delete"
+
+msgid "lower score represents stronger match"
+msgstr "lower score represents stronger match"
+
+msgid "Merge"
+msgstr "Merge"
+
+msgid "Ignore"
+msgstr "Ignore"
+
+msgid "Update Threshold Settings"
+msgstr "Update Threshold Settings"
+
+msgid "Update"
+msgstr "Update"
+
+msgid ""
+"A threshold value between 0 and 1 to determine auto matching, lower values "
+"require a closer match"
+msgstr ""
+"A threshold value between 0 and 1 to determine auto matching, lower values "
+"require a closer match"

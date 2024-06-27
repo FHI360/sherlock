@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useDataQuery, useDataEngine } from '@dhis2/app-runtime'
-import { SharedStateContext, provisionOUs, deleteObjects, customImage } from '../utils'
+import { SharedStateContext, provisionOUs, deleteObjects, customImage, } from '../utils'
 import classes from '../App.module.css'
 import { useNavigate } from 'react-router-dom';
 import { config, SearchHistory} from '../consts'

@@ -30,7 +30,8 @@ const ProjectAttributeComponent = ({
     setDataStoreProfile, 
     setSelectedOU,
     extSetMatchThresh,
-    extSetMatchThreshholdWeight
+    extSetMatchThreshholdWeight,
+    
     }) => {
     const { loading, error, data, refetch } = useDataQuery(query, {variables: {id: selectedProgramID}})
     

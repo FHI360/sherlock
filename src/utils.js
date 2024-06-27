@@ -58,6 +58,121 @@ export const createOrUpdateDataStore = async (engine, postObject, store, key, mo
   }
 }
 
+export const createMetadata = async (engine, postObject, mode)=>{
+    try {
+      const result = await engine.mutate({
+        resource: 'metadata',
+        type: 'create',
+        // partial: true,
+        data: postObject,
+      });
+        return { success: true, message: result };
+    } catch (error) {
+        return { success: false, message: error };          
+    }
+}
+
+export const updateTrackedEntityIgnore = async (engine, teiUpdate, tei_value, payload) => {
+  const ignore_values = Object.values(teiUpdate);
+  // console.log(ignore_values)
+  // if ('score' in tei_value || 'matches' in tei_value) {
+  //   if ('score' in tei_value) {
+  //       delete tei_value.score;
+  //   }
+  //   if ('matches' in tei_value) {
+  //       delete tei_value.matches;
+  //   }
+  // }
+
+  const trackedEntities = ignore_values.map(item => item.trackedEntity);
+    const ignoreAttr =  {
+        "attribute": "sher1dupli1",
+        "displayName": "Ignored duplicate",
+        "valueType": "LONG_TEXT",
+        "value": trackedEntities.join(';')
+
+    }
+
+
+  // console.log('ignoreAttr: ', ignoreAttr); 
+  const exist = payload.enrollments[0].attributes.filter(attr => attr.attribute === "sher1dupli1") || []
+  // if (exist.length === 0){
+          payload.enrollments[0].attributes.push(ignoreAttr)
+          console.log('payload:', payload)
+          const events = payload?.enrollments[0]?.events || [];
+          console.log('events:', events)
+
+          if ('events' in payload.enrollments[0]){
+            delete payload.enrollments[0].events;
+          }
+
+          const nestedPayload = {
+
+            "trackedEntities": [
+              {
+                "orgUnit": payload.orgUnit,
+                "trackedEntity": payload.trackedEntity,
+                "trackedEntityType": payload.trackedEntityType,
+                "attributes": payload.enrollments[0].attributes,
+              }
+            ]
+            // "enrollments": payload.enrollments,
+            // "events": events,
+            // "relationships": payload?.relationships || []
+          }
+
+          const flatPayload = {
+            "trackedEntities": [
+              {
+                "orgUnit": payload.orgUnit,
+                "trackedEntity": payload.trackedEntity,
+                "trackedEntityType": payload.trackedEntityType,
+                "relationships": payload?.relationships || [],
+                "enrollments": payload.enrollments,
+                "programOwners":payload.programOwners
+              }
+            ],
+
+          }
+          console.log('nestedPayload: ', nestedPayload)
+          const mode = 'update'
+          try {
+            const response = await engine.mutate({
+                  resource: 'tracker',
+                  type: mode ? 'create' : 'update',
+                  partial: true,
+                  // async:false,
+                  data : nestedPayload
+
+              });
+              console.log('trackedEntity update response:', response);
+              // successMessage();
+              //handleCloseModal();
+          } catch (error) {
+              // errorMessage(error)
+              console.error('trackedEntity error response: ' +  error);
+          }
+  // } 
+}
+
+export const delete_tei = async (engine, tei) => {
+
+  try {
+    const response = await engine.mutate({
+          resource: `trackedEntityInstances/${tei}`,
+          type: 'delete',
+      });
+      return true
+      // console.log('Delete response:', response);
+      // successMessage();
+      //handleCloseModal();
+  } catch (error) {
+      // errorMessage(error)
+      return false
+      // console.error('Error deleting Object : ' + tei, error);
+  }
+
+}
 export const generateRandomId = () => {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   const idLength = 11;
@@ -99,6 +214,12 @@ export const deleteObjects = async (engine, store, key, obj) =>{
     console.error(`Error deleting ${key}`, error);
     return false
   }
+}
+
+export const trimNameToMax50Chars = (name) => {
+
+  const maxNameLength = 50;
+  return name.trim().slice(0, maxNameLength);
 }
 
 /** for routing and contexting */
@@ -193,21 +314,3 @@ export const useSharedState = () => {
   }
 }
 
-export const delete_tei = async (engine, tei) => {
-
-  try {
-    const response = await engine.mutate({
-          resource: `trackedEntityInstances/${tei}`,
-          type: 'delete',
-      });
-      return true
-      // console.log('Delete response:', response);
-      // successMessage();
-      //handleCloseModal();
-  } catch (error) {
-      // errorMessage(error)
-      return false
-      // console.error('Error deleting Object : ' + tei, error);
-  }
-
-}
