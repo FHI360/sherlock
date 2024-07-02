@@ -301,9 +301,7 @@ export const SearchWorkerComponent = () => {
 
 		const fuse = new Fuse(data, options)
 		const matchedIds = [];
-        // console.log('matchingSharedThresholdWeight: ', matchingSharedThresholdWeight)
-        // console.log('data4: ', data)
-        // console.log('teis', teis)
+		console.log('Data', data)
 		data.forEach(d => {
 			//Proceed to match only items that are not included in any match yet (selected)
 			if (!data.filter(_d => _d.selected).map(_d => _d.id).includes(d.id)) {
@@ -311,7 +309,10 @@ export const SearchWorkerComponent = () => {
 				const search = keys.map(k => d[k]).join(' ');
 				const adaptedSearchTerm = search.split(' ').map(word => `${word}`).join(' | ')
 				// console.log('Adapted search', adaptedSearchTerm)
-				let matches = fuse.search(adaptedSearchTerm).filter(m => m.score < matchingSharedThresholdWeight)
+				let matches = fuse.search(adaptedSearchTerm)
+					//Filter out ignore data
+					.filter(m => d.sher1dupli1 ? d.sher1dupli1.indexOf(m.item.id) < 0 : true)
+					.filter(m => m.score < matchingSharedThresholdWeight)
 				// console.log('Matches', matches)
 				//Filter out self from matches
 				matches = matches.filter(r => r.item.id !== d.id)
