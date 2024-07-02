@@ -30,6 +30,7 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 	const [uids, setUids] = useState('');
 	const [stageIds, setStageIds] = useState('');
 	const [relationships, setRelationships] = useState([]);
+	const [currentItems, setCurrentItems] = useState(0);
 
 	const trackerMutation = {
 		resource: 'tracker',
@@ -51,13 +52,11 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 		programStages: {
 			resource: 'programStages',
 			params: ({stageIds}) => ({
-				fields: 'name, id',
+				fields: 'name, id, programStageDataElements(dataElement,programStage)',
 				filter: `id:in:${stageIds}`
 			})
 		}
 	}
-
-	const {data: queryResult, refetch: refetch} = useDataQuery(dataElementsQuery, {variables: {uids, stageIds}})
 
 	const childTrackedEntity = {
 		trackedEntity: {
@@ -84,11 +83,14 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 	} = useDataQuery(parentTrackedEntity, {variables: {id: selectedMergingItems.tei_parent}})
 
 	useEffect(() => {
-		refetch({uids, stageIds});
-		if (queryResult) {
-			setDataElements(queryResult.dataElements.dataElements);
-			setProgramStages(queryResult.programStages.programStages)
-
+		if (uids.length && stageIds.length && (uids.length + stageIds.length) !== currentItems) {
+			setCurrentItems(uids.length + stageIds.length);
+			engine.query(dataElementsQuery, {variables: {uids, stageIds}}).then(queryResult => {
+				if (queryResult) {
+					setDataElements(queryResult.dataElements.dataElements);
+					setProgramStages(queryResult.programStages.programStages)
+				}
+			})
 		}
 	}, [uids, dataElements])
 
@@ -99,27 +101,31 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 
 			const de = [];
 			const stages = [];
-			parentEntity.trackedEntity.enrollments[0].events.forEach(evt => {
-				if (!stages.includes(evt.programStage)) {
-					stages.push(evt.programStage)
-				}
-				evt.dataValues.forEach(dv => {
-					if (!de.includes(dv.dataElement)) {
-						de.push(dv.dataElement);
+			if (parentEntity.trackedEntity.enrollments && parentEntity.trackedEntity.enrollments.length) {
+				parentEntity.trackedEntity.enrollments[0].events.forEach(evt => {
+					if (!stages.includes(evt.programStage)) {
+						stages.push(evt.programStage)
 					}
+					evt.dataValues.forEach(dv => {
+						if (!de.includes(dv.dataElement)) {
+							de.push(dv.dataElement);
+						}
+					})
 				})
-			})
+			}
 
-			childEntity.trackedEntity.enrollments[0].events.forEach(evt => {
-				if (!stages.includes(evt.programStage)) {
-					stages.push(evt.programStage)
-				}
-				evt.dataValues.forEach(dv => {
-					if (!de.includes(dv.dataElement)) {
-						de.push(dv.dataElement);
+			if (childEntity.trackedEntity.enrollments && childEntity.trackedEntity.enrollments.length) {
+				childEntity.trackedEntity.enrollments[0].events.forEach(evt => {
+					if (!stages.includes(evt.programStage)) {
+						stages.push(evt.programStage)
 					}
+					evt.dataValues.forEach(dv => {
+						if (!de.includes(dv.dataElement)) {
+							de.push(dv.dataElement);
+						}
+					})
 				})
-			})
+			}
 
 			//Set up default selections
 			const events = parentEntity.trackedEntity.enrollments[0].events.map(evt => {
@@ -170,8 +176,10 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 			})
 		} else {
 			setAttributes(() => {
+				console.log('Original', attributes)
 				const filtered = attributes.filter(attr => attr.attribute !== attribute.attribute)
 				filtered.push(attribute);
+				console.log('Filtered', filtered)
 				return filtered;
 			})
 		}
@@ -214,25 +222,43 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 		entity.enrollments[0].attributes = filteredAttributes;
 
 		//Add selected data values
-		const filteredEvents = entity.enrollments[0].events.filter(evt => !events.find(e => e.event === evt.event))
+		let filteredEvents = entity.enrollments[0].events.filter(evt => !events.find(e => e.event === evt.event))
 		filteredEvents.push(...events);
+		//Filter dataElements for stage
+		filteredEvents = filteredEvents.map(evt => {
+			evt.dataValues = evt.dataValues.filter(dv => {
+				const programStageDataElements = programStages.map(ps => {
+					return ps.programStageDataElements.filter(psde => {
+						return psde.programStage.id === evt.programStage
+					}).map(psde => psde.dataElement.id)
+				});
+				return programStageDataElements.includes(dv.dataElement)
+			});
+			return evt;
+		})
 		entity.enrollments[0].events = filteredEvents;
+
+		const enrollments = entity.enrollments;
+		delete entity.enrollments;
 
 		//Add selected relationship merging
 		const filteredRelationships = entity.relationships.filter(rel => !relationships.find(a => a.relationship === rel.relationship));
 		filteredRelationships.push(...relationships)
 		entity.relationships = filteredRelationships;
 
+		delete childEntity.trackedEntity.enrollments;
+		delete childEntity.trackedEntity.relationships;
+		delete childEntity.trackedEntity.programOwners;
+
 		const payload = {
 			trackedEntities: [
 				entity,
 				{
-					trackedEntity: childEntity.trackedEntity.trackedEntity,
-					inactive: true,
-					orgUnit: childEntity.trackedEntity.orgUnit,
-					trackedEntityType: childEntity.trackedEntity.trackedEntityType
+					...childEntity.trackedEntity,
+					inactive: true
 				}
-			]
+			],
+			enrollments
 		};
 
 		engine.mutate(trackerMutation, {variables: {payload}})

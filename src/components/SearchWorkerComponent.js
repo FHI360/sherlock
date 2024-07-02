@@ -301,7 +301,6 @@ export const SearchWorkerComponent = () => {
 
 		const fuse = new Fuse(data, options)
 		const matchedIds = [];
-		console.log('Data', data)
 		data.forEach(d => {
 			//Proceed to match only items that are not included in any match yet (selected)
 			if (!data.filter(_d => _d.selected).map(_d => _d.id).includes(d.id)) {
