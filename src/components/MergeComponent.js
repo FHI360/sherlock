@@ -133,8 +133,25 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 				return evt;
 			})
 			setEvents(events);
+
 			setAttributes(parentEntity.trackedEntity.attributes)
+			console.log('Parent Data: ', parentEntity.trackedEntity.attributes)
+			// const codeQR = {
+			// 	"attribute": "MIjTrxagBVC",
+			// 	"displayName": "Code QR",
+			// 	"createdAt": "2023-09-06T17:13:55.217",
+			// 	"updatedAt": "2023-09-06T17:13:55.217",
+			// 	"storedBy": "ASACONORD2",
+			// 	"value": 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="P-03-TRA-NA-TRA-MAL-BAM-gumNL',
+			// 	"valueType": "URL"
+			// }
+			// parentEntity.trackedEntity.enrollments[0].attributes.push(codeQR)
+			// const filtered_parentEntity = parentEntity.trackedEntity.enrollments[0].attributes.filter(attr => attr.attribute !== 'MIjTrxagBVC')
+			// console.log('filtered_parentEntity Enrollment Data: ', filtered_parentEntity)
+			// console.log('Parent Enrollment Data: ', parentEntity.trackedEntity.enrollments[0].attributes)
 			setEnrollmentAttributes(parentEntity.trackedEntity.enrollments[0].attributes)
+			// setEnrollmentAttributes(parentEntity)
+
 			setRelationships(parentEntity.trackedEntity.relationships)
 
 			setUids(`[${de.join(',')}]`)
@@ -208,7 +225,7 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 		})
 	}
 
-	const mergeEntities = () => {
+	const mergeEntities = async () => {
 		const entity = parentEntity.trackedEntity;
 
 		//Filter for selected entity attributes
@@ -261,7 +278,22 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 			enrollments
 		};
 
-		engine.mutate(trackerMutation, {variables: {payload}})
+		// engine.mutate(trackerMutation, {variables: {payload}})
+		console.log('payload is  : ',payload)
+		const mode = 'update'
+		try {
+            const response = await engine.mutate({
+                  resource: 'tracker',
+                  type: mode ? 'create' : 'update',
+                  partial: true,
+                  // async:false,
+                  data : payload
+              });
+			console.log('trackedEntity update response:', response);
+
+          } catch (error) {
+              console.error('trackedEntity error response: ' +  error);
+          }
 	}
 
 	return (<>

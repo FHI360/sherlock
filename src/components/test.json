@@ -1,327 +1,237 @@
 {
-    "trackedEntities": [
+  "trackedEntities": [
       {
-        "orgUnit": "O6uvpzGd5pu",
-        "trackedEntity": "Kj6vYde4LHh",
-        "trackedEntityType": "Q9GufDoplCL",
-        "relationships": [
-          {
-            "relationshipType": "Udhj3bsdHeT",
-            "from": {
-              "trackedEntity": { "trackedEntity": "Kj6vYde4LHh" }
-            },
-            "to": {
-              "trackedEntity": { "trackedEntity": "Gjaiu3ea38E" }
-            }
-          }
-        ],
-        "enrollments": [
-          {
-            "orgUnit": "O6uvpzGd5pu",
-            "program": "f1AyMswryyQ",
-            "trackedEntity": "Kj6vYde4LHh",
-            "enrollment": "MNWZ6hnuhSw",
-            "trackedEntityType": "Q9GufDoplCL",
-            "enrolledAt": "2019-08-19T00:00:00.000",
-            "deleted": false,
-            "occurredAt": "2019-08-19T00:00:00.000",
-            "status": "ACTIVE",
-            "notes": [],
-            "relationships": [],
-            "attributes": [],
-            "events": [
+          "trackedEntity": "BMlQRONKWvL",
+          "trackedEntityType": "bs2xhPLf2d9",
+          "createdAt": "2023-09-06T17:13:55.209",
+          "updatedAt": "2024-07-02T07:37:09.626",
+          "orgUnit": "XuGdY1K6OwX",
+          "inactive": false,
+          "deleted": false,
+          "potentialDuplicate": false,
+          "updatedBy": {
+              "uid": "ZUNjalFLxwj",
+              "username": "fhiadmin",
+              "firstName": "fhiadmin",
+              "surname": "fhiadmin"
+          },
+          "relationships": [],
+          
+          "attributes": [
               {
-                "scheduledAt": "2019-08-19T13:59:13.688",
-                "program": "f1AyMswryyQ",
-                "event": "ZwwuwNp6gVd",
-                "programStage": "nlXNK4b7LVr",
-                "orgUnit": "O6uvpzGd5pu",
-                "trackedEntity": "Kj6vYde4LHh",
-                "enrollment": "MNWZ6hnuhSw",
-                "enrollmentStatus": "ACTIVE",
-                "status": "ACTIVE",
-                "occurredAt": "2019-08-01T00:00:00.000",
-                "attributeCategoryOptions": "xYerKDKCefk",
-                "deleted": false,
-                "attributeOptionCombo": "HllvX50cXC0",
-                "dataValues": [
-                  {
-                    "updatedAt": "2019-08-19T13:58:37.477",
-                    "storedBy": "admin",
-                    "dataElement": "BuZ5LGNfGEU",
-                    "value": "20",
-                    "providedElsewhere": false
-                  },
-                  {
-                    "updatedAt": "2019-08-19T13:58:40.031",
-                    "storedBy": "admin",
-                    "dataElement": "ZrqtjjveTFc",
-                    "value": "Male",
-                    "providedElsewhere": false
-                  },
-                  {
-                    "updatedAt": "2019-08-19T13:59:13.691",
-                    "storedBy": "admin",
-                    "dataElement": "mB2QHw1tU96",
-                    "value": "[-11.566044,9.477801]",
-                    "providedElsewhere": false
-                  }
-                ],
-                "notes": [],
-                "relationships": []
+                  "attribute": "cg3U6LECG7P",
+                  "displayName": "Type de population",
+                  "createdAt": "2023-09-06T17:13:55.232",
+                  "updatedAt": "2023-09-06T17:13:55.232",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "TEXT",
+                  "value": "Population générale"
               },
               {
-                "scheduledAt": "2019-08-19T13:59:13.688",
-                "program": "f1AyMswryyQ",
-                "event": "XwwuwNp6gVE",
-                "programStage": "PaOOjwLVW23",
-                "orgUnit": "O6uvpzGd5pu",
-                "trackedEntity": "Kj6vYde4LHh",
-                "enrollment": "MNWZ6hnuhSw",
-                "enrollmentStatus": "ACTIVE",
-                "status": "ACTIVE",
-                "occurredAt": "2019-08-01T00:00:00.000",
-                "attributeCategoryOptions": "xYerKDKCefk",
-                "deleted": false,
-                "attributeOptionCombo": "HllvX50cXC0",
-                "notes": [],
-                "relationships": []
+                  "attribute": "CKjqobWBRi0",
+                  "displayName": "Prénom",
+                  "createdAt": "2023-09-06T17:13:55.213",
+                  "updatedAt": "2023-09-06T17:13:55.213",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "TEXT",
+                  "value": "MAIMOUNA"
+              },
+              {
+                  "attribute": "DwhtS4WGEr0",
+                  "displayName": "Nationalité",
+                  "createdAt": "2023-09-06T17:13:55.221",
+                  "updatedAt": "2023-09-06T17:13:55.221",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "TEXT",
+                  "value": "MALIENNE"
+              },
+              {
+                  "attribute": "gn87DfSvo9v",
+                  "displayName": "Sexe",
+                  "createdAt": "2023-09-06T17:13:55.212",
+                  "updatedAt": "2023-09-06T17:13:55.212",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "TEXT",
+                  "value": "F"
+              },
+              {
+                  "attribute": "hKnG1SiWxHk",
+                  "displayName": "Nom",
+                  "createdAt": "2023-09-06T17:13:55.211",
+                  "updatedAt": "2023-09-06T17:13:55.211",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "TEXT",
+                  "value": "TRAORE"
+              },
+              {
+                  "attribute": "MTlAK3rhB4v",
+                  "displayName": "Code IU",
+                  "createdAt": "2023-09-06T17:13:55.217",
+                  "updatedAt": "2023-09-06T17:13:55.217",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "TEXT",
+                  "value": "P-03-TR-TR-MAL-BA"
+              },
+              {
+                  "attribute": "n9KTBH7G7Sk",
+                  "displayName": "Ville de Résidence",
+                  "createdAt": "2023-09-06T17:13:55.227",
+                  "updatedAt": "2023-09-06T17:13:55.227",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "TEXT",
+                  "value": "BAMAKO"
+              },
+              {
+                  "attribute": "O66xnwOPpRl",
+                  "displayName": "Ville de Naissance",
+                  "createdAt": "2023-09-06T17:13:55.214",
+                  "updatedAt": "2023-09-06T17:13:55.214",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "TEXT",
+                  "value": "BAMAKO"
+              },
+              {
+                  "attribute": "WtpJBRbxMeH",
+                  "displayName": "Age",
+                  "createdAt": "2023-09-06T17:13:55.215",
+                  "updatedAt": "2023-09-06T17:13:55.215",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "NUMBER",
+                  "value": "20"
+              },
+              {
+                  "attribute": "xT9Q3U0PPpT",
+                  "displayName": "Nom famille de la Mère",
+                  "createdAt": "2023-09-06T17:13:55.226",
+                  "updatedAt": "2023-09-06T17:13:55.226",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "TEXT",
+                  "value": "TRAORE"
               }
-            ]
-          }
+          ],
+          "programOwners": [
+              {
+                  "orgUnit": "XuGdY1K6OwX",
+                  "trackedEntity": "BMlQRONKWvL",
+                  "program": "OfzMww7i92z"
+              }
+          ]
+      },
+      {
+        "trackedEntity": "skcOjRhoPu7",
+        "trackedEntityType": "bs2xhPLf2d9",
+        "createdAt": "2022-08-31T13:20:02.779",
+        "createdAtClient": "2022-08-31T13:20:02.779",
+        "updatedAt": "2023-05-31T11:22:14.215",
+        "updatedAtClient": "2022-08-31T13:20:02.779",
+        "orgUnit": "XuGdY1K6OwX",
+        "inactive": true,
+        "deleted": false,
+        "potentialDuplicate": false,
+        "storedBy": "ASACONORD2",
+        "attributes": [
+            {
+                "attribute": "cg3U6LECG7P",
+                "displayName": "Type de population",
+                "createdAt": "2022-08-31T13:20:02.793",
+                "updatedAt": "2022-08-31T13:20:02.793",
+                "storedBy": "ASACONORD2",
+                "valueType": "TEXT",
+                "value": "Population générale"
+            },
+            {
+                "attribute": "CKjqobWBRi0",
+                "displayName": "Prénom",
+                "createdAt": "2022-08-31T13:20:02.783",
+                "updatedAt": "2022-08-31T13:20:02.783",
+                "storedBy": "ASACONORD2",
+                "valueType": "TEXT",
+                "value": "BANA"
+            },
+            {
+                "attribute": "DwhtS4WGEr0",
+                "displayName": "Nationalité",
+                "createdAt": "2022-08-31T13:20:02.787",
+                "updatedAt": "2022-08-31T13:20:02.787",
+                "storedBy": "ASACONORD2",
+                "valueType": "TEXT",
+                "value": "MALIENNE"
+            },
+            {
+                "attribute": "gn87DfSvo9v",
+                "displayName": "Sexe",
+                "createdAt": "2022-08-31T13:20:02.782",
+                "updatedAt": "2022-08-31T13:20:02.782",
+                "storedBy": "ASACONORD2",
+                "valueType": "TEXT",
+                "value": "F"
+            },
+            {
+                "attribute": "hKnG1SiWxHk",
+                "displayName": "Nom",
+                "createdAt": "2022-08-31T13:20:02.781",
+                "updatedAt": "2022-08-31T13:20:02.781",
+                "storedBy": "ASACONORD2",
+                "valueType": "TEXT",
+                "value": "TRAORE"
+            },
+            {
+                "attribute": "MTlAK3rhB4v",
+                "displayName": "Code IU",
+                "createdAt": "2022-08-31T13:20:02.785",
+                "updatedAt": "2022-08-31T13:20:02.785",
+                "storedBy": "ASACONORD2",
+                "valueType": "TEXT",
+                "value": "P-02-TR-TR-MAL-BA"
+            },
+            {
+                "attribute": "n9KTBH7G7Sk",
+                "displayName": "Ville de Résidence",
+                "createdAt": "2022-08-31T13:20:02.790",
+                "updatedAt": "2022-08-31T13:20:02.790",
+                "storedBy": "ASACONORD2",
+                "valueType": "TEXT",
+                "value": "BAMAKO"
+            },
+            {
+                "attribute": "O66xnwOPpRl",
+                "displayName": "Ville de Naissance",
+                "createdAt": "2022-08-31T13:20:02.783",
+                "updatedAt": "2022-08-31T13:20:02.783",
+                "storedBy": "ASACONORD2",
+                "valueType": "TEXT",
+                "value": "BAMAKO"
+            },
+            {
+                "attribute": "WtpJBRbxMeH",
+                "displayName": "Age",
+                "createdAt": "2022-08-31T13:20:02.783",
+                "updatedAt": "2022-08-31T13:20:02.783",
+                "storedBy": "ASACONORD2",
+                "valueType": "NUMBER",
+                "value": "20"
+            },
+            {
+                "attribute": "Wz6y6hdqfZz",
+                "displayName": "Nouveau CIU",
+                "createdAt": "2023-04-12T10:15:35.528",
+                "updatedAt": "2023-05-31T11:22:14.191",
+                "storedBy": "ASibanda",
+                "valueType": "TEXT",
+                "value": "P-02-TRA-NA-TRA-MAL-BAM-crpGx"
+            },
+            {
+                "attribute": "xT9Q3U0PPpT",
+                "displayName": "Nom famille de la Mère",
+                "createdAt": "2022-08-31T13:20:02.790",
+                "updatedAt": "2022-08-31T13:20:02.790",
+                "storedBy": "ASACONORD2",
+                "valueType": "TEXT",
+                "value": "TRAORE"
+            }
         ]
-      }
-    ]
-  }
+    }
 
-  {
-    "trackedEntities": [
-        {
-            "orgUnit": "kbGqmM6ZWWV",
-            "trackedEntity": "wGhSrhu4lV8",
-            "trackedEntityType": "nEenWmSyUEp",
-            "relationships": [],
-            "enrollments": [
-                {
-                    "enrollment": "gMOBfoRAGC8",
-                    "createdAt": "2018-08-07T15:47:28.312",
-                    "createdAtClient": "2017-08-07T15:47:28.312",
-                    "updatedAt": "2018-08-07T15:47:28.312",
-                    "trackedEntity": "wGhSrhu4lV8",
-                    "program": "IpHINAT79UW",
-                    "status": "ACTIVE",
-                    "orgUnit": "kbGqmM6ZWWV",
-                    "orgUnitName": "Allen Town Health Post",
-                    "enrolledAt": "2025-03-09T12:05:00.000",
-                    "occurredAt": "2025-03-09T12:05:00.000",
-                    "followUp": false,
-                    "deleted": false,
-                    "events": [
-                        {
-                            "event": "q4g5XvFCSz2",
-                            "status": "ACTIVE",
-                            "program": "IpHINAT79UW",
-                            "programStage": "A03MvHHogjR",
-                            "enrollment": "gMOBfoRAGC8",
-                            "trackedEntity": "wGhSrhu4lV8",
-                            "orgUnit": "kbGqmM6ZWWV",
-                            "orgUnitName": "Allen Town Health Post",
-                            "relationships": [],
-                            "occurredAt": "2024-03-09T00:00:00.000",
-                            "scheduledAt": "2024-03-09T12:05:00.000",
-                            "followup": false,
-                            "deleted": false,
-                            "createdAt": "2018-08-07T15:47:28.312",
-                            "createdAtClient": "2017-08-07T15:47:28.312",
-                            "updatedAt": "2018-08-07T15:47:28.312",
-                            "attributeOptionCombo": "HllvX50cXC0",
-                            "attributeCategoryOptions": "xYerKDKCefk",
-                            "assignedUser": {},
-                            "dataValues": [
-                                {
-                                    "createdAt": "2015-03-09T12:05:00.000",
-                                    "updatedAt": "2015-03-09T12:05:00.000",
-                                    "providedElsewhere": false,
-                                    "dataElement": "X8zyunlgUfM",
-                                    "value": "Exclusive"
-                                },
-                                {
-                                    "createdAt": "2015-03-09T12:05:00.000",
-                                    "updatedAt": "2015-03-09T12:05:00.000",
-                                    "providedElsewhere": false,
-                                    "dataElement": "ebaJjqltK5N",
-                                    "value": "0"
-                                },
-                                {
-                                    "createdAt": "2015-03-09T12:05:00.000",
-                                    "updatedAt": "2015-03-09T12:05:00.000",
-                                    "providedElsewhere": false,
-                                    "dataElement": "bx6fsa0t90x",
-                                    "value": "false"
-                                },
-                                {
-                                    "createdAt": "2015-03-09T12:05:00.000",
-                                    "updatedAt": "2015-03-09T12:05:00.000",
-                                    "providedElsewhere": false,
-                                    "dataElement": "wQLfBvPrXqq",
-                                    "value": "NVP only"
-                                },
-                                {
-                                    "createdAt": "2015-03-09T12:05:00.000",
-                                    "updatedAt": "2015-03-09T12:05:00.000",
-                                    "providedElsewhere": false,
-                                    "dataElement": "a3kGcGDCuk6",
-                                    "value": "0"
-                                },
-                                {
-                                    "createdAt": "2015-03-09T12:05:00.000",
-                                    "updatedAt": "2015-03-09T12:05:00.000",
-                                    "providedElsewhere": false,
-                                    "dataElement": "UXz7xuGCEhU",
-                                    "value": "3782"
-                                }
-                            ],
-                            "notes": []
-                        },
-                        {
-                            "event": "pV1Xbt4ziqG",
-                            "status": "ACTIVE",
-                            "program": "IpHINAT79UW",
-                            "programStage": "ZzYYXq4fJie",
-                            "enrollment": "gMOBfoRAGC8",
-                            "trackedEntity": "wGhSrhu4lV8",
-                            "orgUnit": "kbGqmM6ZWWV",
-                            "orgUnitName": "Allen Town Health Post",
-                            "relationships": [],
-                            "occurredAt": "2024-03-30T00:00:00.000",
-                            "scheduledAt": "2024-03-30T12:05:00.000",
-                            "followup": false,
-                            "deleted": false,
-                            "createdAt": "2018-08-07T15:47:28.312",
-                            "createdAtClient": "2017-08-07T15:47:28.312",
-                            "updatedAt": "2018-08-07T15:47:28.312",
-                            "attributeOptionCombo": "HllvX50cXC0",
-                            "attributeCategoryOptions": "xYerKDKCefk",
-                            "assignedUser": {},
-                            "dataValues": [
-                                {
-                                    "createdAt": "2015-03-09T12:05:00.000",
-                                    "updatedAt": "2015-03-09T12:05:00.000",
-                                    "providedElsewhere": false,
-                                    "dataElement": "X8zyunlgUfM",
-                                    "value": "Replacement"
-                                },
-                                {
-                                    "createdAt": "2015-03-09T12:05:00.000",
-                                    "updatedAt": "2015-03-09T12:05:00.000",
-                                    "providedElsewhere": false,
-                                    "dataElement": "GQY2lXrypjO",
-                                    "value": "3520"
-                                },
-                                {
-                                    "createdAt": "2015-03-09T12:05:00.000",
-                                    "updatedAt": "2015-03-09T12:05:00.000",
-                                    "providedElsewhere": false,
-                                    "dataElement": "HLmTEmupdX0",
-                                    "value": "false"
-                                },
-                                {
-                                    "createdAt": "2015-03-09T12:05:00.000",
-                                    "updatedAt": "2015-03-09T12:05:00.000",
-                                    "providedElsewhere": false,
-                                    "dataElement": "cYGaxwK615G",
-                                    "value": "Positive"
-                                },
-                                {
-                                    "createdAt": "2015-03-09T12:05:00.000",
-                                    "updatedAt": "2015-03-09T12:05:00.000",
-                                    "providedElsewhere": false,
-                                    "dataElement": "hDZbpskhqDd",
-                                    "value": "PCR"
-                                },
-                                {
-                                    "createdAt": "2015-03-09T12:05:00.000",
-                                    "updatedAt": "2015-03-09T12:05:00.000",
-                                    "providedElsewhere": false,
-                                    "dataElement": "lNNb3truQoi",
-                                    "value": "IPT 2"
-                                },
-                                {
-                                    "createdAt": "2015-03-09T12:05:00.000",
-                                    "updatedAt": "2015-03-09T12:05:00.000",
-                                    "providedElsewhere": false,
-                                    "dataElement": "pOe0ogW4OWd",
-                                    "value": "3"
-                                },
-                                {
-                                    "createdAt": "2015-03-09T12:05:00.000",
-                                    "updatedAt": "2015-03-09T12:05:00.000",
-                                    "providedElsewhere": false,
-                                    "dataElement": "sj3j9Hwc7so",
-                                    "value": "TDF/3TC/NVP - 1"
-                                },
-                                {
-                                    "createdAt": "2015-03-09T12:05:00.000",
-                                    "updatedAt": "2015-03-09T12:05:00.000",
-                                    "providedElsewhere": false,
-                                    "dataElement": "vTUhAUZFoys",
-                                    "value": "0"
-                                },
-                                {
-                                    "createdAt": "2015-03-09T12:05:00.000",
-                                    "updatedAt": "2015-03-09T12:05:00.000",
-                                    "providedElsewhere": false,
-                                    "dataElement": "FqlgKAG8HOu",
-                                    "value": "true"
-                                },
-                                {
-                                    "createdAt": "2015-03-09T12:05:00.000",
-                                    "updatedAt": "2015-03-09T12:05:00.000",
-                                    "providedElsewhere": false,
-                                    "dataElement": "rxBfISxXS2U",
-                                    "value": "false"
-                                }
-                            ],
-                            "notes": []
-                        }
-                    ],
-                    "relationships": [],
-                    "attributes": [
-                        {
-                            "attribute": "w75KJ2mc4zz",
-                            "code": "MMD_PER_NAM",
-                            "displayName": "First name",
-                            "createdAt": "2016-01-12T09:10:26.986",
-                            "updatedAt": "2016-01-12T09:10:35.884",
-                            "valueType": "TEXT",
-                            "value": "Paul"
-                        },
-                        {
-                            "attribute": "zDhUuAYrxNC",
-                            "displayName": "Last name",
-                            "createdAt": "2016-01-12T09:10:26.986",
-                            "updatedAt": "2016-01-12T09:10:35.884",
-                            "valueType": "TEXT",
-                            "value": "Pierce"
-                        },
-                        {
-                            "attribute": "cejWyOfXge6",
-                            "displayName": "Gender",
-                            "createdAt": "2016-01-12T09:10:26.986",
-                            "updatedAt": "2016-01-12T09:10:35.884",
-                            "valueType": "TEXT",
-                            "value": "Male"
-                        },
-                        {
-                            "attribute": "sher1dupli1",
-                            "displayName": "Ignored duplicate",
-                            "valueType": "LONG_TEXT",
-                            "value": "L2CsFLRIVAk;wGhSrhu4lV8"
-                        }
-                    ],
-                    "notes": []
-                }
-            ]
-        }
-    ]
+  ]
+
 }
