@@ -133,9 +133,29 @@ const MergeComponent = ({setMergeAction, selectedMergingItems}) => {
 				return evt;
 			})
 			setEvents(events);
-			setAttributes(parentEntity.trackedEntity.attributes)
-			setEnrollmentAttributes(parentEntity.trackedEntity.enrollments[0].attributes)
-			setRelationships(parentEntity.trackedEntity.relationships)
+			const attributes = parentEntity.trackedEntity.attributes;
+			//Add child attributes not in parent;
+			const childAttrs = childEntity.trackedEntity.attributes.filter(attr => {
+				return !attributes.find(attribute => attribute.attribute === attr.attribute)
+			});
+			attributes.push(...childAttrs);
+			setAttributes(attributes)
+
+			const enrollmentAttributes = parentEntity.trackedEntity.enrollments[0].attributes;
+			//Add child attributes not in parent;
+			const childEnrollmentAttrs = childEntity.trackedEntity.enrollments[0].attributes.filter(attr => {
+				return !enrollmentAttributes.find(attribute => attribute.attribute === attr.attribute)
+			});
+			enrollmentAttributes.push(...childEnrollmentAttrs);
+			setEnrollmentAttributes(enrollmentAttributes)
+
+			const relationships = parentEntity.trackedEntity.relationships;
+			//Add child relationships not in parent;
+			const childRelationships = childEntity.trackedEntity.relationships.filter(attr => {
+				return !relationships.find(rel => rel.relationship === attr.relationship)
+			});
+			relationships.push(...childRelationships);
+			setRelationships(relationships)
 
 			setUids(`[${de.join(',')}]`)
 			setStageIds(`[${stages.join(',')}]`)
