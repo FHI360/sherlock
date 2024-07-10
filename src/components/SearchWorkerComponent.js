@@ -290,7 +290,7 @@ export const SearchWorkerComponent = () => {
 			includeScore: true,
 			isCaseSensitive: false,
 			keys: keys,
-			useExtendedSearch: true,
+			useExtendedSearch: false,
 			minMatchCharLength: 3,
 			fieldNormWeight: 2,
 			findAllMatches: true,
@@ -306,9 +306,9 @@ export const SearchWorkerComponent = () => {
 			if (!data.filter(_d => _d.selected).map(_d => _d.id).includes(d.id)) {
 				//Join all available TEI attributes to form search string
 				const search = keys.map(k => d[k]).join(' ');
-				const adaptedSearchTerm = search.split(' ').map(word => `${word}`).join(' | ')
+				//const adaptedSearchTerm = search.split(' ').map(word => `${word}`).join(' | ')
 				// console.log('Adapted search', adaptedSearchTerm)
-				let matches = fuse.search(adaptedSearchTerm)
+				let matches = fuse.search(search)
 					//Filter out ignore data
 					.filter(m => d.sher1dupli1 ? d.sher1dupli1.indexOf(m.item.id) < 0 : true)
 					.filter(m => m.score < matchingSharedThresholdWeight)
