@@ -73,8 +73,10 @@ export const createMetadata = async (engine, postObject, mode)=>{
 }
 
 export const updateTrackedEntityIgnore = async (engine, teiUpdate, tei_value, payload) => {
+   // get the values of the json object
   const ignore_values = Object.values(teiUpdate);
-  // console.log(ignore_values)
+  console.log('******** ignore_values **********')
+  console.log(ignore_values)
   // if ('score' in tei_value || 'matches' in tei_value) {
   //   if ('score' in tei_value) {
   //       delete tei_value.score;
@@ -85,6 +87,7 @@ export const updateTrackedEntityIgnore = async (engine, teiUpdate, tei_value, pa
   // }
 
   const trackedEntities = ignore_values.map(item => item.trackedEntity);
+    console.log(trackedEntities)
     const ignoreAttr =  {
         "attribute": "sher1dupli1",
         "displayName": "Ignored duplicate",
@@ -94,7 +97,7 @@ export const updateTrackedEntityIgnore = async (engine, teiUpdate, tei_value, pa
     }
 
 
-  // console.log('ignoreAttr: ', ignoreAttr); 
+  console.log('ignoreAttr: ', ignoreAttr); 
   const exist = payload.enrollments[0].attributes.filter(attr => attr.attribute === "sher1dupli1") || []
   // if (exist.length === 0){
           payload.enrollments[0].attributes.push(ignoreAttr)

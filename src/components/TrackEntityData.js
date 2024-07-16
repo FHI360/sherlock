@@ -25,6 +25,7 @@ const SelectedTrackedEntity2 = {
 
 const TrackEntityData = ({teiUpdate, trackedEntityType, setIgnoreAction}) => {
 	const engine = useDataEngine()
+	// to get the values from the json object
 	const tei_values = Object.values(teiUpdate);
 	const {
 		loading: loadingSelectedTrackedEntity1,
@@ -41,7 +42,7 @@ const TrackEntityData = ({teiUpdate, trackedEntityType, setIgnoreAction}) => {
 
 	
 	useEffect(()=>{
-
+		// To popluate the tracked entities with the parent and child uids
 		if (dataSelectedTrackedEntity1){
 			processTeiValues(tei_values[0],dataSelectedTrackedEntity1.trackedEntity);
 		}
@@ -52,6 +53,7 @@ const TrackEntityData = ({teiUpdate, trackedEntityType, setIgnoreAction}) => {
     },[dataSelectedTrackedEntity1, dataSelectedTrackedEntity2])
 
 	useEffect(() => {
+		// to refetch the data with new tei value
 		refetchDataelectedTrackedEntity1({id: tei_values[0]?.trackedEntity})
         refetchDataelectedTrackedEntity2({id: tei_values[1]?.trackedEntity})
     }, [teiUpdate]);

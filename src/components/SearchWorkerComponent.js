@@ -907,4 +907,3 @@ export const SearchWorkerComponent = () => {
         </div>
     )
 }
-

@@ -185,6 +185,7 @@ export const Main = () => {
         } else {
             setSelectedAttr(prevSelected => [...prevSelected, target]);
         }
+        console.log('selectedAttr: ',selectedAttr)
 
     }
 

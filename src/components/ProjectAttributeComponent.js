@@ -54,7 +54,7 @@ const ProjectAttributeComponent = ({
             console.log(attrs)
                 {
                 const attrsFiltered = attrs.map(attr => ({
-                    id: attr.id,
+                    id: attr.trackedEntityAttribute.id,
                     displayName: attr.displayName,
                     searchable:attr.searchable
                 }))

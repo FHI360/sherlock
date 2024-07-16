@@ -232,6 +232,26 @@
         ]
     }
 
-  ]
-
+  ],
+  "enrollments": [
+    {
+        "enrollment": "nrQwEfgumNL",
+        "createdAt": "2023-09-06T17:13:55.251",
+        "createdAtClient": "2023-09-06T17:13:55.254",
+        "updatedAt": "2023-09-06T17:13:55.254",
+        "updatedAtClient": "2023-09-06T17:13:55.254",
+        "trackedEntity": "BMlQRONKWvL",
+        "program": "OfzMww7i92z",
+        "status": "ACTIVE",
+        "orgUnit": "XuGdY1K6OwX",
+        "orgUnitName": "ASACKO NORD",
+        "enrolledAt": "2023-09-06T00:00:00.000",
+        "occurredAt": "2023-09-06T00:00:00.000",
+        "followUp": false,
+        "deleted": false,
+        "storedBy": "ASACONORD2",
+        "relationships": [],
+        "notes": []
+    }
+]
 }
