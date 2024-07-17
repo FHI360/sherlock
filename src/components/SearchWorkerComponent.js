@@ -290,7 +290,7 @@ export const SearchWorkerComponent = () => {
 			ignoreLocation: true,
 			fieldNormWeight: 2,
 			findAllMatches: true,
-			threshold: matchingSharedThreshold
+			threshold: matchingSharedThreshold ? matchingSharedThreshold / 100 : 0.01,
 		}
         // console.log(options)
         const resultObj = []
@@ -308,7 +308,7 @@ export const SearchWorkerComponent = () => {
 				let matches = fuse.search(adaptedSearchTerm)
 					//Filter out ignore data
 					.filter(m => d.sher1dupli1 ? d.sher1dupli1.indexOf(m.item.id) < 0 : true)
-					.filter(m => m.score < matchingSharedThresholdWeight)
+					.filter(m => m.score < matchingSharedThresholdWeight ? Math.pow(10, -matchingSharedThresholdWeight) : 1e-32)
 				// console.log('Matches', matches)
 				//Filter out self from matches
 				matches = matches.filter(r => r.item.id !== d.id)
