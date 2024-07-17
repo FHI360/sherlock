@@ -177,7 +177,7 @@ export const SearchWorkerComponent = () => {
 			const totalFetched = page * pageSize;
 			if (totalFetched <= total) {
 				fetching = `Fetching ${totalFetched} of ${total}...`;
-			} else {
+			} else if (totalFetched >= total) {
 				fetching = `Fetching ${total} of ${total}...`;
 			}
 			setFetching(fetching);
@@ -228,8 +228,8 @@ export const SearchWorkerComponent = () => {
 					}
 				})
 			} else {
-				setFetching('');
 				processData(_data, _teis);
+				setFetching('');
                 _data = []
                 _teis = []
 			}
@@ -270,16 +270,12 @@ export const SearchWorkerComponent = () => {
 
     
 	const processData = (data, teis) => {
+		setFetching('Matching...');
 		// console.log('Processing', data)
 		//Build TEI attributes for use with fuse.js
         // console.log('data3', data)
 
-		const keys = [];
-		data.map(d => Object.keys(d)).flat().forEach(k => {
-			if (k !== 'id' && k !== 'selected' && k !== 'orgUnit' && !keys.includes(k)) {
-				keys.push(k)
-			}
-		})
+		const keys = selectedSharedAttr.map(a => a.id);
 
 		keys.push({
 			name: 'orgUnit',
@@ -290,8 +286,8 @@ export const SearchWorkerComponent = () => {
 			includeScore: true,
 			isCaseSensitive: false,
 			keys: keys,
-			useExtendedSearch: false,
-			minMatchCharLength: 3,
+			useExtendedSearch: true,
+			ignoreLocation: true,
 			fieldNormWeight: 2,
 			findAllMatches: true,
 			threshold: matchingSharedThreshold
@@ -299,16 +295,17 @@ export const SearchWorkerComponent = () => {
         // console.log(options)
         const resultObj = []
 
-		const fuse = new Fuse(data, options)
 		const matchedIds = [];
-		data.forEach(d => {
+		let _data = [...data];
+		_data.forEach(d => {
 			//Proceed to match only items that are not included in any match yet (selected)
-			if (!data.filter(_d => _d.selected).map(_d => _d.id).includes(d.id)) {
+			if (!_data.filter(_d => _d.selected).map(_d => _d.id).includes(d.id)) {
 				//Join all available TEI attributes to form search string
-				const search = keys.map(k => d[k]).join(' ');
-				//const adaptedSearchTerm = search.split(' ').map(word => `${word}`).join(' | ')
+				const search = keys.map(k => d[k]).filter(k => k?.length).join(' ');
+				const adaptedSearchTerm = search.split(' ').map(word => `${word}`).join(' | ')
 				// console.log('Adapted search', adaptedSearchTerm)
-				let matches = fuse.search(search)
+				const fuse = new Fuse(_data, options)
+				let matches = fuse.search(adaptedSearchTerm)
 					//Filter out ignore data
 					.filter(m => d.sher1dupli1 ? d.sher1dupli1.indexOf(m.item.id) < 0 : true)
 					.filter(m => m.score < matchingSharedThresholdWeight)
@@ -325,11 +322,8 @@ export const SearchWorkerComponent = () => {
 						//Get back original object
 						const match = teis.find(t => t.trackedEntity === m.item.id);
 
-						//Mark self as selected
-						const tmp = data.find(_d => _d.id === m.item.id)
-						data = data.filter(d_ => d_.id !== m.item.id)
-						tmp.selected = true;
-						data.push(tmp);
+						//Filter out matched TEI
+						_data = _data.filter(d_ => d_.id !== m.item.id)
 
 						return {
 							...match,
@@ -339,9 +333,9 @@ export const SearchWorkerComponent = () => {
 				}
 
 				//Mark self as selected
-				data = data.filter(d_ => d_.id !== d.id)
-				d.selected = true;
-				data.push(d);
+				_data = _data.filter(d_ => d_.id !== d.id)
+
+				//Add result
 				resultObj.push(result);
 			}
 		})
