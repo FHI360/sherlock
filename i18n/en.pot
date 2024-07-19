@@ -5,11 +5,57 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2024-05-02T12:05:50.768Z\n"
-"PO-Revision-Date: 2024-05-02T12:05:50.770Z\n"
+"POT-Creation-Date: 2024-07-04T12:43:47.747Z\n"
+"PO-Revision-Date: 2024-07-04T12:43:47.748Z\n"
 
-msgid "Hello {{name}}"
-msgstr "Hello {{name}}"
+msgid "Select program"
+msgstr "Select program"
 
-msgid "Welcome to DHIS2!"
-msgstr "Welcome to DHIS2!"
+msgid "Sherlock will search for matches or near matches of the program attributes"
+msgstr "Sherlock will search for matches or near matches of the program attributes"
+
+msgid "Find Duplicates"
+msgstr "Find Duplicates"
+
+msgid "Max of 5"
+msgstr "Max of 5"
+
+msgid "Add or Remove Attributes in Duplicate Checker"
+msgstr "Add or Remove Attributes in Duplicate Checker"
+
+msgid "Attribute Name"
+msgstr "Attribute Name"
+
+msgid "Priority"
+msgstr "Priority"
+
+msgid "{{displayName}}"
+msgstr "{{displayName}}"
+
+msgid "Open"
+msgstr "Open"
+
+msgid "Delete"
+msgstr "Delete"
+
+msgid "lower score represents stronger match"
+msgstr "lower score represents stronger match"
+
+msgid "Merge"
+msgstr "Merge"
+
+msgid "Ignore"
+msgstr "Ignore"
+
+msgid "Update Threshold Settings"
+msgstr "Update Threshold Settings"
+
+msgid "Update"
+msgstr "Update"
+
+msgid ""
+"A threshold value between 0 and 1 to determine auto matching, lower values "
+"require a closer match"
+msgstr ""
+"A threshold value between 0 and 1 to determine auto matching, lower values "
+"require a closer match"

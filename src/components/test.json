@@ -1,0 +1,257 @@
+{
+  "trackedEntities": [
+      {
+          "trackedEntity": "BMlQRONKWvL",
+          "trackedEntityType": "bs2xhPLf2d9",
+          "createdAt": "2023-09-06T17:13:55.209",
+          "updatedAt": "2024-07-02T07:37:09.626",
+          "orgUnit": "XuGdY1K6OwX",
+          "inactive": false,
+          "deleted": false,
+          "potentialDuplicate": false,
+          "updatedBy": {
+              "uid": "ZUNjalFLxwj",
+              "username": "fhiadmin",
+              "firstName": "fhiadmin",
+              "surname": "fhiadmin"
+          },
+          "relationships": [],
+          
+          "attributes": [
+              {
+                  "attribute": "cg3U6LECG7P",
+                  "displayName": "Type de population",
+                  "createdAt": "2023-09-06T17:13:55.232",
+                  "updatedAt": "2023-09-06T17:13:55.232",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "TEXT",
+                  "value": "Population générale"
+              },
+              {
+                  "attribute": "CKjqobWBRi0",
+                  "displayName": "Prénom",
+                  "createdAt": "2023-09-06T17:13:55.213",
+                  "updatedAt": "2023-09-06T17:13:55.213",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "TEXT",
+                  "value": "MAIMOUNA"
+              },
+              {
+                  "attribute": "DwhtS4WGEr0",
+                  "displayName": "Nationalité",
+                  "createdAt": "2023-09-06T17:13:55.221",
+                  "updatedAt": "2023-09-06T17:13:55.221",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "TEXT",
+                  "value": "MALIENNE"
+              },
+              {
+                  "attribute": "gn87DfSvo9v",
+                  "displayName": "Sexe",
+                  "createdAt": "2023-09-06T17:13:55.212",
+                  "updatedAt": "2023-09-06T17:13:55.212",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "TEXT",
+                  "value": "F"
+              },
+              {
+                  "attribute": "hKnG1SiWxHk",
+                  "displayName": "Nom",
+                  "createdAt": "2023-09-06T17:13:55.211",
+                  "updatedAt": "2023-09-06T17:13:55.211",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "TEXT",
+                  "value": "TRAORE"
+              },
+              {
+                  "attribute": "MTlAK3rhB4v",
+                  "displayName": "Code IU",
+                  "createdAt": "2023-09-06T17:13:55.217",
+                  "updatedAt": "2023-09-06T17:13:55.217",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "TEXT",
+                  "value": "P-03-TR-TR-MAL-BA"
+              },
+              {
+                  "attribute": "n9KTBH7G7Sk",
+                  "displayName": "Ville de Résidence",
+                  "createdAt": "2023-09-06T17:13:55.227",
+                  "updatedAt": "2023-09-06T17:13:55.227",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "TEXT",
+                  "value": "BAMAKO"
+              },
+              {
+                  "attribute": "O66xnwOPpRl",
+                  "displayName": "Ville de Naissance",
+                  "createdAt": "2023-09-06T17:13:55.214",
+                  "updatedAt": "2023-09-06T17:13:55.214",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "TEXT",
+                  "value": "BAMAKO"
+              },
+              {
+                  "attribute": "WtpJBRbxMeH",
+                  "displayName": "Age",
+                  "createdAt": "2023-09-06T17:13:55.215",
+                  "updatedAt": "2023-09-06T17:13:55.215",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "NUMBER",
+                  "value": "20"
+              },
+              {
+                  "attribute": "xT9Q3U0PPpT",
+                  "displayName": "Nom famille de la Mère",
+                  "createdAt": "2023-09-06T17:13:55.226",
+                  "updatedAt": "2023-09-06T17:13:55.226",
+                  "storedBy": "ASACONORD2",
+                  "valueType": "TEXT",
+                  "value": "TRAORE"
+              }
+          ],
+          "programOwners": [
+              {
+                  "orgUnit": "XuGdY1K6OwX",
+                  "trackedEntity": "BMlQRONKWvL",
+                  "program": "OfzMww7i92z"
+              }
+          ]
+      },
+      {
+        "trackedEntity": "skcOjRhoPu7",
+        "trackedEntityType": "bs2xhPLf2d9",
+        "createdAt": "2022-08-31T13:20:02.779",
+        "createdAtClient": "2022-08-31T13:20:02.779",
+        "updatedAt": "2023-05-31T11:22:14.215",
+        "updatedAtClient": "2022-08-31T13:20:02.779",
+        "orgUnit": "XuGdY1K6OwX",
+        "inactive": true,
+        "deleted": false,
+        "potentialDuplicate": false,
+        "storedBy": "ASACONORD2",
+        "attributes": [
+            {
+                "attribute": "cg3U6LECG7P",
+                "displayName": "Type de population",
+                "createdAt": "2022-08-31T13:20:02.793",
+                "updatedAt": "2022-08-31T13:20:02.793",
+                "storedBy": "ASACONORD2",
+                "valueType": "TEXT",
+                "value": "Population générale"
+            },
+            {
+                "attribute": "CKjqobWBRi0",
+                "displayName": "Prénom",
+                "createdAt": "2022-08-31T13:20:02.783",
+                "updatedAt": "2022-08-31T13:20:02.783",
+                "storedBy": "ASACONORD2",
+                "valueType": "TEXT",
+                "value": "BANA"
+            },
+            {
+                "attribute": "DwhtS4WGEr0",
+                "displayName": "Nationalité",
+                "createdAt": "2022-08-31T13:20:02.787",
+                "updatedAt": "2022-08-31T13:20:02.787",
+                "storedBy": "ASACONORD2",
+                "valueType": "TEXT",
+                "value": "MALIENNE"
+            },
+            {
+                "attribute": "gn87DfSvo9v",
+                "displayName": "Sexe",
+                "createdAt": "2022-08-31T13:20:02.782",
+                "updatedAt": "2022-08-31T13:20:02.782",
+                "storedBy": "ASACONORD2",
+                "valueType": "TEXT",
+                "value": "F"
+            },
+            {
+                "attribute": "hKnG1SiWxHk",
+                "displayName": "Nom",
+                "createdAt": "2022-08-31T13:20:02.781",
+                "updatedAt": "2022-08-31T13:20:02.781",
+                "storedBy": "ASACONORD2",
+                "valueType": "TEXT",
+                "value": "TRAORE"
+            },
+            {
+                "attribute": "MTlAK3rhB4v",
+                "displayName": "Code IU",
+                "createdAt": "2022-08-31T13:20:02.785",
+                "updatedAt": "2022-08-31T13:20:02.785",
+                "storedBy": "ASACONORD2",
+                "valueType": "TEXT",
+                "value": "P-02-TR-TR-MAL-BA"
+            },
+            {
+                "attribute": "n9KTBH7G7Sk",
+                "displayName": "Ville de Résidence",
+                "createdAt": "2022-08-31T13:20:02.790",
+                "updatedAt": "2022-08-31T13:20:02.790",
+                "storedBy": "ASACONORD2",
+                "valueType": "TEXT",
+                "value": "BAMAKO"
+            },
+            {
+                "attribute": "O66xnwOPpRl",
+                "displayName": "Ville de Naissance",
+                "createdAt": "2022-08-31T13:20:02.783",
+                "updatedAt": "2022-08-31T13:20:02.783",
+                "storedBy": "ASACONORD2",
+                "valueType": "TEXT",
+                "value": "BAMAKO"
+            },
+            {
+                "attribute": "WtpJBRbxMeH",
+                "displayName": "Age",
+                "createdAt": "2022-08-31T13:20:02.783",
+                "updatedAt": "2022-08-31T13:20:02.783",
+                "storedBy": "ASACONORD2",
+                "valueType": "NUMBER",
+                "value": "20"
+            },
+            {
+                "attribute": "Wz6y6hdqfZz",
+                "displayName": "Nouveau CIU",
+                "createdAt": "2023-04-12T10:15:35.528",
+                "updatedAt": "2023-05-31T11:22:14.191",
+                "storedBy": "ASibanda",
+                "valueType": "TEXT",
+                "value": "P-02-TRA-NA-TRA-MAL-BAM-crpGx"
+            },
+            {
+                "attribute": "xT9Q3U0PPpT",
+                "displayName": "Nom famille de la Mère",
+                "createdAt": "2022-08-31T13:20:02.790",
+                "updatedAt": "2022-08-31T13:20:02.790",
+                "storedBy": "ASACONORD2",
+                "valueType": "TEXT",
+                "value": "TRAORE"
+            }
+        ]
+    }
+
+  ],
+  "enrollments": [
+    {
+        "enrollment": "nrQwEfgumNL",
+        "createdAt": "2023-09-06T17:13:55.251",
+        "createdAtClient": "2023-09-06T17:13:55.254",
+        "updatedAt": "2023-09-06T17:13:55.254",
+        "updatedAtClient": "2023-09-06T17:13:55.254",
+        "trackedEntity": "BMlQRONKWvL",
+        "program": "OfzMww7i92z",
+        "status": "ACTIVE",
+        "orgUnit": "XuGdY1K6OwX",
+        "orgUnitName": "ASACKO NORD",
+        "enrolledAt": "2023-09-06T00:00:00.000",
+        "occurredAt": "2023-09-06T00:00:00.000",
+        "followUp": false,
+        "deleted": false,
+        "storedBy": "ASACONORD2",
+        "relationships": [],
+        "notes": []
+    }
+]
+}

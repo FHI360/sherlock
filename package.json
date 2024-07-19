@@ -21,6 +21,7 @@
   "dependencies": {
     "@dhis2/app-runtime": "^3.10.4",
     "fuse.js": "^7.0.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "react-router-dom": "^6.23.1"
   }
 }

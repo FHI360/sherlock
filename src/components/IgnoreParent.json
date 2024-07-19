@@ -1,0 +1,196 @@
+{
+    "trackedEntities": [
+        {
+            "orgUnit": "XuGdY1K6OwX",
+            "trackedEntity": "BMlQRONKWvL",
+            "trackedEntityType": "bs2xhPLf2d9",
+            "attributes": [
+                {
+                    "attribute": "MTlAK3rhB4v",
+                    "displayName": "Code IU",
+                    "createdAt": "2023-09-06T17:13:55.217",
+                    "updatedAt": "2023-09-06T17:13:55.217",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "TEXT",
+                    "value": "P-03-TR-TR-MAL-BA"
+                },
+                {
+                    "attribute": "cg3U6LECG7P",
+                    "displayName": "Type de population",
+                    "createdAt": "2023-09-06T17:13:55.232",
+                    "updatedAt": "2023-09-06T17:13:55.232",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "TEXT",
+                    "value": "Population générale"
+                },
+                {
+                    "attribute": "zFOHsdG7gft",
+                    "displayName": "Statut Matrimoniale",
+                    "createdAt": "2023-09-06T17:13:55.222",
+                    "updatedAt": "2023-09-06T17:13:55.222",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "TEXT",
+                    "value": "Marié"
+                },
+                {
+                    "attribute": "L4rT3o13b2h",
+                    "displayName": "Numéro de dossier",
+                    "createdAt": "2023-09-06T17:13:55.216",
+                    "updatedAt": "2023-09-06T17:13:55.216",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "TEXT",
+                    "value": "710"
+                },
+                {
+                    "attribute": "cAMrfN22Qs9",
+                    "displayName": "Quartier",
+                    "createdAt": "2023-09-06T17:13:55.228",
+                    "updatedAt": "2023-09-06T17:13:55.228",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "TEXT",
+                    "value": "NAFADJI"
+                },
+                {
+                    "attribute": "CKjqobWBRi0",
+                    "displayName": "Prénom",
+                    "createdAt": "2023-09-06T17:13:55.213",
+                    "updatedAt": "2023-09-06T17:13:55.213",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "TEXT",
+                    "value": "MAIMOUNA"
+                },
+                {
+                    "attribute": "tsZ1QW7fzEp",
+                    "displayName": "Nom Centre de Santé",
+                    "createdAt": "2023-09-06T17:13:55.231",
+                    "updatedAt": "2023-09-06T17:13:55.231",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "ORGANISATION_UNIT",
+                    "value": "XuGdY1K6OwX"
+                },
+                {
+                    "attribute": "O66xnwOPpRl",
+                    "displayName": "Ville de Naissance",
+                    "createdAt": "2023-09-06T17:13:55.214",
+                    "updatedAt": "2023-09-06T17:13:55.214",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "TEXT",
+                    "value": "BAMAKO"
+                },
+                {
+                    "attribute": "zUxEUHGVwbI",
+                    "displayName": "Groupe d'age",
+                    "createdAt": "2023-09-06T17:13:55.220",
+                    "updatedAt": "2023-09-06T17:13:55.220",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "TEXT",
+                    "value": "20-24"
+                },
+                {
+                    "attribute": "VrO1Jml1m0x",
+                    "displayName": "Profession",
+                    "createdAt": "2023-09-06T17:13:55.224",
+                    "updatedAt": "2023-09-06T17:13:55.224",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "TEXT",
+                    "value": "MENAGERE"
+                },
+                {
+                    "attribute": "hKnG1SiWxHk",
+                    "displayName": "Nom",
+                    "createdAt": "2023-09-06T17:13:55.211",
+                    "updatedAt": "2023-09-06T17:13:55.211",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "TEXT",
+                    "value": "TRAORE"
+                },
+                {
+                    "attribute": "PEyjpngv89e",
+                    "displayName": "Nom du prestataire",
+                    "createdAt": "2023-09-06T17:13:55.230",
+                    "updatedAt": "2023-09-06T17:13:55.230",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "TEXT",
+                    "value": "ASSITAN"
+                },
+                {
+                    "attribute": "WtpJBRbxMeH",
+                    "displayName": "Age",
+                    "createdAt": "2023-09-06T17:13:55.215",
+                    "updatedAt": "2023-09-06T17:13:55.215",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "NUMBER",
+                    "value": "20"
+                },
+                {
+                    "attribute": "DwhtS4WGEr0",
+                    "displayName": "Nationalité",
+                    "createdAt": "2023-09-06T17:13:55.221",
+                    "updatedAt": "2023-09-06T17:13:55.221",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "TEXT",
+                    "value": "MALIENNE"
+                },
+                {
+                    "attribute": "MpHDmz5VB7Q",
+                    "displayName": "Dernière Classe (Niveau d’étude)",
+                    "createdAt": "2023-09-06T17:13:55.225",
+                    "updatedAt": "2023-09-06T17:13:55.225",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "TEXT",
+                    "value": "non scolarisé"
+                },
+                {
+                    "attribute": "sher1dupli1",
+                    "displayName": "Ignored duplicate",
+                    "createdAt": "2024-06-27T15:47:27.188",
+                    "updatedAt": "2024-06-27T15:47:27.188",
+                    "valueType": "LONG_TEXT",
+                    "value": "BMlQRONKWvL;wsSLejvdvyK"
+                },
+                {
+                    "attribute": "gn87DfSvo9v",
+                    "displayName": "Sexe",
+                    "createdAt": "2023-09-06T17:13:55.212",
+                    "updatedAt": "2023-09-06T17:13:55.212",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "TEXT",
+                    "value": "F"
+                },
+                {
+                    "attribute": "xT9Q3U0PPpT",
+                    "displayName": "Nom famille de la Mère",
+                    "createdAt": "2023-09-06T17:13:55.226",
+                    "updatedAt": "2023-09-06T17:13:55.226",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "TEXT",
+                    "value": "TRAORE"
+                },
+                {
+                    "attribute": "uOI5TNKKPOg",
+                    "displayName": "Year of birth",
+                    "createdAt": "2023-09-06T17:13:55.219",
+                    "updatedAt": "2023-09-06T17:13:55.219",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "TEXT",
+                    "value": "2003"
+                },
+                {
+                    "attribute": "n9KTBH7G7Sk",
+                    "displayName": "Ville de Résidence",
+                    "createdAt": "2023-09-06T17:13:55.227",
+                    "updatedAt": "2023-09-06T17:13:55.227",
+                    "storedBy": "ASACONORD2",
+                    "valueType": "TEXT",
+                    "value": "BAMAKO"
+                },
+                {
+                    "attribute": "sher1dupli1",
+                    "displayName": "Ignored duplicate",
+                    "valueType": "LONG_TEXT",
+                    "value": "skcOjRhoPu7;BMlQRONKWvL"
+                }
+            ]
+        }
+    ]
+}

@@ -43,3 +43,6 @@ You can learn more about the platform in the [DHIS2 Application Platform Documen
 You can learn more about the runtime in the [DHIS2 Application Runtime Documentation](https://runtime.dhis2.nu/).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+Resources
+https://github.com/WebDevSimplified/react-navbar/blob/main/src/Navbar.js
