@@ -1,8 +1,7 @@
-import React, {useState } from 'react'
-
 import { useDataQuery } from '@dhis2/app-runtime'
-import classes from '../App.module.css'
 import { OrganisationUnitTree } from '@dhis2-ui/organisation-unit-tree'
+import React, {useState } from 'react'
+import classes from '../App.module.css'
 import { customImage } from '../utils';
 
 

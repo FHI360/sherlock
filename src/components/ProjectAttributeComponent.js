@@ -1,21 +1,22 @@
 
 import { useDataQuery } from '@dhis2/app-runtime'
-import { useEffect, useState } from 'react';
-import { SingleSelect, SingleSelectOption  } from '@dhis2-ui/select'
-import { Checkbox } from '@dhis2/ui'
-import classes from '../App.module.css'
-import { Chip } from '@dhis2-ui/chip'
-import { customImage } from '../utils';
-import { config, ProjectsFiltersMore} from '../consts'
-import { IconChevronDown24, IconChevronRight24 } from '@dhis2/ui-icons'; 
 import i18n from '@dhis2/d2-i18n'
+import { Checkbox } from '@dhis2/ui'
+import { IconChevronDown24, IconChevronRight24 } from '@dhis2/ui-icons'; 
+import { Chip } from '@dhis2-ui/chip'
+import { SingleSelect, SingleSelectOption  } from '@dhis2-ui/select'
+import { useEffect, useState } from 'react';
+import classes from '../App.module.css'
+import { config, ProjectsFiltersMore, match_threshold, match_threshold_weight} from '../consts'
+import { customImage } from '../utils';
+
 
 const query = {
     programTrackedEntityAttributes: {
         resource: "programs",
         id: ({ id }) => id,
         params: {
-            fields:['id', 'displayName', 'programTrackedEntityAttributes'],
+            fields:['id', 'displayName', 'programTrackedEntityAttributes', 'trackedEntityType'],
             paging: 'false'
         },
     }
@@ -31,6 +32,8 @@ const ProjectAttributeComponent = ({
     setSelectedOU,
     extSetMatchThresh,
     extSetMatchThreshholdWeight,
+    setFullOrgUnitSearch,
+    
     
     }) => {
     const { loading, error, data, refetch } = useDataQuery(query, {variables: {id: selectedProgramID}})
@@ -51,7 +54,7 @@ const ProjectAttributeComponent = ({
             const attrs = data?.programTrackedEntityAttributes?.programTrackedEntityAttributes || []
             // console.log(attrs)
             if (attrs.lenght > 0)
-            console.log(attrs)
+            {console.log(attrs)}
                 {
                 const attrsFiltered = attrs.map(attr => ({
                     id: attr.trackedEntityAttribute.id,
@@ -78,10 +81,12 @@ const ProjectAttributeComponent = ({
                 }
                 const initialSelectedAttr = newProjects[0]?.attributesSelected || []
                 const storedOU = newProjects[0]?.selectedOU || []
-                const storedMatchingThreshold = newProjects[0]?.matchingThreshold || 0.6
-                const storedMatchingThresholdWeight = newProjects[0]?.matchingThresholdWeight || 1e-20
+                const storedMatchingThreshold = newProjects[0]?.matchingThreshold || match_threshold
+                const storedMatchingThresholdWeight = newProjects[0]?.matchingThresholdWeight || match_threshold_weight
+                const storedfullOrgUnitSearch  = newProjects[0]?.fullOrgUnitSearch || false
                 setSelectedAttr(initialSelectedAttr);
                 setSelectedOU(storedOU);
+                setFullOrgUnitSearch(storedfullOrgUnitSearch)
                 extSetMatchThresh(storedMatchingThreshold)
                 extSetMatchThreshholdWeight(storedMatchingThresholdWeight)
             }
@@ -102,7 +107,7 @@ const ProjectAttributeComponent = ({
 
     if (error) {
         return <div className={classes.programAttributeEmptyContainer}>
-                    <span style={{ textAlign: 'center' }}>Select a program</span>
+                    <span style={{ textAlign: 'center' }}> {i18n.t('Select program')}</span>
                 </div>
     }
 

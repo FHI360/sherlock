@@ -5,8 +5,11 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2024-07-04T12:43:47.747Z\n"
-"PO-Revision-Date: 2024-07-04T12:43:47.748Z\n"
+"POT-Creation-Date: 2024-07-29T09:20:45.154Z\n"
+"PO-Revision-Date: 2024-07-29T09:20:45.155Z\n"
+
+msgid "Maximum of 2 attributes can be selected for search"
+msgstr "Maximum of 2 attributes can be selected for search"
 
 msgid "Select program"
 msgstr "Select program"
@@ -17,8 +20,8 @@ msgstr "Sherlock will search for matches or near matches of the program attribut
 msgid "Find Duplicates"
 msgstr "Find Duplicates"
 
-msgid "Max of 5"
-msgstr "Max of 5"
+msgid "Max of 2"
+msgstr "Max of 2"
 
 msgid "Add or Remove Attributes in Duplicate Checker"
 msgstr "Add or Remove Attributes in Duplicate Checker"
@@ -26,8 +29,8 @@ msgstr "Add or Remove Attributes in Duplicate Checker"
 msgid "Attribute Name"
 msgstr "Attribute Name"
 
-msgid "Priority"
-msgstr "Priority"
+msgid "Index"
+msgstr "Index"
 
 msgid "{{displayName}}"
 msgstr "{{displayName}}"
@@ -38,6 +41,9 @@ msgstr "Open"
 msgid "Delete"
 msgstr "Delete"
 
+msgid "Ignore All"
+msgstr "Ignore All"
+
 msgid "lower score represents stronger match"
 msgstr "lower score represents stronger match"
 
@@ -47,6 +53,12 @@ msgstr "Merge"
 msgid "Ignore"
 msgstr "Ignore"
 
+msgid "Matching Threshold settings Updated"
+msgstr "Matching Threshold settings Updated"
+
+msgid "Matching Threshold must be between 0 to 100. Cannot be  "
+msgstr "Matching Threshold must be between 0 to 100. Cannot be  "
+
 msgid "Update Threshold Settings"
 msgstr "Update Threshold Settings"
 
@@ -54,8 +66,8 @@ msgid "Update"
 msgstr "Update"
 
 msgid ""
-"A threshold value between 0 and 1 to determine auto matching, lower values "
-"require a closer match"
+"A threshold value between 0 and 100 to determine auto matching, lower "
+"values require a closer match"
 msgstr ""
-"A threshold value between 0 and 1 to determine auto matching, lower values "
-"require a closer match"
+"A threshold value between 0 and 100 to determine auto matching, lower "
+"values require a closer match"

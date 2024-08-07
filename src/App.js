@@ -1,8 +1,8 @@
 import React from 'react'
 import { HashRouter, Navigate, Route, Routes, BrowserRouter } from 'react-router-dom'
 import classes from './App.module.css'
-import { Navigation } from './components/navigation/Index'
 import { Main, SearchWorkerComponent,SearchHistoryComponent } from './components/main/Index'
+import { Navigation } from './components/navigation/Index'
 import { footerText} from './consts';
 import SetupStateProvider from './SetupStateProvider'
 

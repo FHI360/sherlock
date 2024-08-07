@@ -1,19 +1,5 @@
-import { useAlert } from '@dhis2/app-runtime'
-import {useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAlert , useDataEngine } from '@dhis2/app-runtime'
 import i18n from '@dhis2/d2-i18n'
-import React from 'react'
-import classes from '../../App.module.css'
-import OrganisationUnitComponent from '../OrganisationUnitComponent'
-import { config, MainTitle, searchBoundarySelected, searchBoundaryfull, panelAction, ProjectAttributedescription } from '../../consts';
-import { generateRandomId, modifiedDate, createOrUpdateDataStore, provisionOUs } from '../../utils';
-import { useDataEngine } from '@dhis2/app-runtime';
-import { Chip } from '@dhis2-ui/chip'
-
-import { IconSave24, IconChevronDown24, IconChevronRight24, IconInfo16 } from '@dhis2/ui-icons'; 
-import ProgramComponent from '../ProgramComponent';
-import ProjectAttributeComponent from '../ProjectAttributeComponent';
-import Thresholdinput from '../Thresholdinput';
 import {
     Table,
     TableHead,
@@ -25,8 +11,17 @@ import {
     Switch,
     Button
   } from '@dhis2/ui';
-
-import { SharedStateContext } from '../../utils'
+  import { SingleSelectOption, SingleSelect, SingleSelectField  } from '@dhis2-ui/select'
+import { IconSave24, IconChevronDown24, IconChevronRight24, IconInfo16, IconArrowUp16} from '@dhis2/ui-icons'; 
+import { Chip } from '@dhis2-ui/chip'
+import React, {useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import classes from '../../App.module.css'
+import { config, MainTitle, searchBoundarySelected, searchBoundaryfull, panelAction, ProjectAttributedescription } from '../../consts';
+import { generateRandomId, modifiedDate, createOrUpdateDataStore, provisionOUs , SharedStateContext } from '../../utils';
+import OrganisationUnitComponent from '../OrganisationUnitComponent'
+import ProgramComponent from '../ProgramComponent';
+import ProjectAttributeComponent from '../ProjectAttributeComponent';
 import ThresholdInput from '../Thresholdinput';
 const query = {
     me: {
@@ -66,11 +61,11 @@ export const Main = () => {
     // console.log('persistSharedData', persistSharedData)
 
     const navigate = useNavigate();
-
     const [selectedOU,setSelectedOU] = useState(selectedSharedOU);
     const [selectedAttr,setSelectedAttr] = useState(selectedSharedAttr);
+    // Initialize state for selected values
     const [selectedProgram,setSelectedProgram] = useState(selectedSharedProgram);
-    const [fullOrgUnitSearch, setFullOrgUnitSearch] = useState(false);
+    const [fullOrgUnitSearch, setFullOrgUnitSearch] = useState(fullOrgUnitSharedSearch);
     const [selectedProgramName,setSelectedProgramName] = useState(selectedSharedProgramName?.displayName || []);    
     const [matchingThreshold, extSetMatchThresh] = useState(matchingSharedThreshold);
     const [matchingThresholdWeight, extSetMatchThreshholdWeight] = useState(matchingSharedThresholdWeight);
@@ -162,6 +157,9 @@ export const Main = () => {
         }
     },[matchingThreshold, matchingThresholdWeight])
     
+    useEffect(()=>{
+        handleSaveorUpdateRecord(dataStoreProfileExist ? 'update' : 'create', selectedAttr);
+    }, [fullOrgUnitSearch])
     /***
      * Org Units Selection Function. Responsible populating OrgUnitsSelected with selected OrgUnits
      * 
@@ -183,10 +181,15 @@ export const Main = () => {
         if (selectedAttr.some(attr => attr.id === target.id)) {
             setSelectedAttr(prevSelected => prevSelected.filter(attr => attr.id !== target.id));
         } else {
-            setSelectedAttr(prevSelected => [...prevSelected, target]);
+            console.log('selectedAttr: ',selectedAttr)
+            console.log('selectedAttr Lenghts: ',selectedAttr.length )
+            if (selectedAttr && selectedAttr.length <= 1){
+                setSelectedAttr(prevSelected => [...prevSelected, target]);
+            }else{
+                show({ msg: i18n.t('Maximum of 2 attributes can be selected for search'), type: 'warning' }) 
+                setProgramAttributeSave(false)
+            }            
         }
-        console.log('selectedAttr: ',selectedAttr)
-
     }
 
     /***
@@ -241,6 +244,40 @@ export const Main = () => {
         // setSelectedAttr([])
     }
 
+
+    const SingleSelectWithState = ({ index, attr }) => {
+        console.log("index: ",index, attr)
+        const [selected, setSelected] = useState("0");
+    
+        const handleSelectChange = ({ selected }) => {
+            setSelected(selected);
+        };
+    
+        return (
+            <SingleSelect
+                selected={selected}
+                onChange={handleSelectChange}
+            >
+                <SingleSelectOption value="0" label="0" />
+                <SingleSelectOption value="1" label="1" />
+            </SingleSelect>
+        );
+    };
+
+    const moveUp = (index) => {
+
+        if (index > 0) {
+            const newDataElements = [...selectedAttr];
+            const rowItem = newDataElements[index];
+            const rowItemReplaced = newDataElements[index-1];
+            newDataElements[index - 1] = rowItem;
+            newDataElements[index] = rowItemReplaced;
+            setSelectedAttr(newDataElements)
+            setProgramAttributeSave(true)           
+
+        }
+        
+    };
 
     return(
                 <div>            
@@ -358,7 +395,7 @@ export const Main = () => {
                                         <span style={{fontWeight:'bold' }}>
                                                 {ProjectAttributedescription}  &nbsp;
                                                 <span style={{fontWeight:'normal', fontSize: '12px'}}>
-                                                    &#40;{i18n.t('Max of 5')}&#41;
+                                                    &#40;{i18n.t('Max of 2')}&#41;
                                                 </span>
                                                 <span style={{fontWeight:'normal', fontSize: '12px', marginLeft:'50px'}}>
                                                 {(selectedProgram.length > 0) && <Chip
@@ -390,6 +427,7 @@ export const Main = () => {
                                                     setDataStoreProfile={setDataStoreProfile}
                                                     setSelectedOU={setSelectedOU}
                                                     extSetMatchThreshholdWeight={extSetMatchThreshholdWeight}
+                                                    setFullOrgUnitSearch={setFullOrgUnitSearch}
                                                     
                                                 />
                                         </div>
@@ -402,24 +440,23 @@ export const Main = () => {
                                                 <TableHead>
                                                     <TableRowHead>
                                                         <TableCellHead>{i18n.t('Attribute Name')}</TableCellHead>
-                                                        <TableCellHead>{i18n.t('Priority')}</TableCellHead>
+                                                        <TableCellHead>{i18n.t('Index')}</TableCellHead>
                                                     </TableRowHead>
 
 
                                                 </TableHead>
 
                                                 <TableBody>
-                                                    {selectedAttr.map(attr => (
-
-                                                                <TableRow key={attr.id} className={classes.customTableRow}>
-                                                                    <TableCell className={classes.customTableCell}>{attr.displayName}</TableCell>
-                                                                    <TableCell className={`${classes.customTableCell}`}>Refouse
-                                                                    </TableCell>
-                                                                </TableRow>
-                                                            
-
+                                                    {selectedAttr.map((attr, index) => (
+                                                        <TableRow key={attr.id} className={classes.customTableRow}>
+                                                            <TableCell className={classes.customTableCell}>{attr.displayName}</TableCell>
+                                                            <TableCell className={classes.customTableCell}>
+                                                            {index}
+                                                            {index > 0 && <span onClick={() => moveUp(index)}><IconArrowUp16 /></span>}
+                                                                    {/* <SingleSelectWithState index={index} attr={attr}/> */}
+                                                            </TableCell>
+                                                        </TableRow>
                                                     ))}
-
                                                 </TableBody>
                                         </Table>}
                                         {selectedProgram.length > 0 && showProgramAttributesSave && <div className={classes.updateSaveProgramAttributeBtn}>

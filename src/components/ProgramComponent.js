@@ -1,9 +1,9 @@
 import { useDataQuery } from '@dhis2/app-runtime'
-import React from 'react'
-import {useContext } from 'react';  
-import { SharedStateContext } from '../utils'
-import classes from '../App.module.css'
 import { SingleSelect, SingleSelectOption, SingleSelectField  } from '@dhis2-ui/select'
+import React, {useContext } from 'react'
+import classes from '../App.module.css'
+import { SharedStateContext } from '../utils'
+import { match_threshold, match_threshold_weight } from '../consts'
 
 /*  Query Parameters**/
 const query = {
@@ -33,8 +33,8 @@ const ProgramComponent = ({ selectedProgram, setSelectedProgram, setSelectedProg
         sharedState.setSelectedSharedOU([])
         sharedState.setSelectedSharedAttr([])
         sharedState.setSelectedSharedProgram([])
-        sharedState.setMatchingSharedThreshold(0.6)
-        sharedState.setMatchingSharedThresholdWeight(1e-20)
+        sharedState.setMatchingSharedThreshold(match_threshold)
+        sharedState.setMatchingSharedThresholdWeight(match_threshold_weight)
         sharedState.setFullOrgUnitSharedSearch(false)
         setDataStoreProfile(false)
         setSelectedProgram(event.selected);

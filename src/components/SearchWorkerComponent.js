@@ -3,12 +3,14 @@ import { useDataQuery, useDataEngine, useAlert, useConfig } from '@dhis2/app-run
 import { SharedStateContext, createOrUpdateDataStore, generateRandomId, modifiedDate, delete_tei, customImage ,createMetadata, updateTrackedEntityIgnore  } from '../utils'
 import { config, SearchHistory, IgnoreAttrMetadata, IgnoreAttrMetadataProvisioning} from '../consts'
 import classes from '../App.module.css'
+import { CircularLoader } from '@dhis2-ui/loader'
 import { IconSave24, IconDownload24 } from '@dhis2/ui-icons'
 import i18n from '@dhis2/d2-i18n'
 import { IconLaunch16, IconDelete16, IconLink16, IconThumbDown16} from '@dhis2/ui-icons'
 import ActionConfirmation from './ActionConfirmation'
 import MergeComponent from './MergeComponent'
 import TrackEntityData from './TrackEntityData'
+import TrackEntityDataMultiple from './TrackEntityDataMultiple'
 
 import {
     DataTable,
@@ -18,7 +20,7 @@ import {
     DataTableCell,
     DataTableColumnHeader,
     TableHead, TableBody,  Button,
-    Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Pagination, Tag
+    Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Pagination, Tag, Checkbox
   } from '@dhis2/ui'
   import { Input } from '@dhis2-ui/input'
   import Fuse from 'fuse.js';
@@ -34,8 +36,9 @@ let _teis = [];
 const trackedEntityInstances = {
     targetedEntity: {
         resource: 'tracker/trackedEntities',
-        params: ({pageSize, page, OUs, selectedSharedProgram}) => ({
-            orgUnit: OUs,
+        params: ({pageSize, page, OUs, rootOU, selectedSharedProgram, fullOrgUnitSharedSearch }) => ({
+            orgUnit: fullOrgUnitSharedSearch ? rootOU : OUs,
+            orgUnitMode: fullOrgUnitSharedSearch ? 'ALL' : 'SELECTED',
             program: selectedSharedProgram,
             fields: "trackedEntity, attributes, orgUnit",
             totalPages: true,
@@ -58,6 +61,13 @@ const programs = {
     },
 }
 
+const dataReportPage = {
+    report: {
+        resource: 'tracker/jobs/',
+        id: 'Qq20ER5ZoCf/report',
+    }
+}
+
 export const SearchWorkerComponent = () => {
     const { show } = useAlert(
         ({ msg }) => msg,
@@ -72,11 +82,17 @@ export const SearchWorkerComponent = () => {
     const [selectedRow, setSelectedRow] = useState([])
     const [selectedRowDeleted, setSelectedRowDeleted] = useState([])
     const [selectedMergingItems, setSelectedMergingItems] = useState([])
+    const [selectedMatches, setSelectedMatches] = useState([])
+    const [selectedMatchesParent, setSelectedMatchesParent] = useState('')
+    const [selectAllCheckBox, setSelectAllCheckBox] = useState(false)
+    const [isPosting, setPosting] =  useState(false)
+    const [processingMergeData, setProcessingMergeData] = useState(false);
 
 	const [dataItems, setDataItems] = useState([])
 	const [pageData, setPageData] = useState([])
 	const [filteredData, setFilteredData] = useState(false)
-
+    
+	const [merged, setMerged] = useState([]);
 
 	const [searchName, setSearchName] = useState('')
 	const [modalSaveSearch, setShowModalSaveSearch] = useState(false)
@@ -85,7 +101,7 @@ export const SearchWorkerComponent = () => {
 	const [page, setPage] = useState(1)
     const [rendered_page, setRendered_page] = useState(1)
 	// const [pageCount, setPageCount] = useState(1)
-	const [pageSize, setPageSize] = useState(50)
+	const [pageSize, setPageSize] = useState(200)
     const [rendered_pageSize, setRendered_PageSize] = useState(50)
     const [pageTotal, setPageTotal] = useState(0)
 	const [deleteConfirmation, setDeleteConfirmation] = useState(false)
@@ -93,11 +109,12 @@ export const SearchWorkerComponent = () => {
     const [IgnoreAction, setIgnoreAction] = useState(false)
     const [teiUpdate, setTeiUpdate] = useState([])
     const [trackedEntityType, setTrackedEntityType] = useState('')
+    const [IgnoreMode, setIgnoreMode] = useState('')
     const [selected_tei, setSelected_tei] = useState('')
     const [deleted_tei, setDeletion] = useState('')
     const [reloadTable, setReloadTable] = useState(false)
-    const [reloadTableData, setReloadTableData] = useState(false)
 	const [fetching, setFetching] = useState('')
+    const [reportPage, setReportPage] = useState('');
 
 
     const sharedState = useContext(SharedStateContext)
@@ -131,8 +148,12 @@ export const SearchWorkerComponent = () => {
     // console.log('fullOrgUnitSharedSearch',fullOrgUnitSharedSearch)
     // console.log('selectedSharedProgramName',selectedSharedProgramName.displayName)
     // console.log('selectedOUSharedforQuery',selectedOUSharedforQuery)
-     
+    const rootOU = selectedSharedOU && selectedSharedOU.length > 0 ? selectedSharedOU[0].split('/')[1]  : '';
+    // console.log('selectedSharedOU', selectedSharedOU)
+    // console.log('rootOU: ', rootOU)
+
     const OUs = selectedOUSharedforQuery.join(';');
+
 
 
 	const {
@@ -140,7 +161,7 @@ export const SearchWorkerComponent = () => {
 		error: error,
 		data: data,
 		refetch: refetch
-	} = useDataQuery(trackedEntityInstances, {variables: {page, pageSize, OUs, selectedSharedProgram}})
+	} = useDataQuery(trackedEntityInstances, {variables: {page, pageSize, OUs, rootOU, selectedSharedProgram, fullOrgUnitSharedSearch}})
 
     const {
 		loading: loadingProgram,
@@ -149,7 +170,12 @@ export const SearchWorkerComponent = () => {
 		refetch: refetchProgram
 	} = useDataQuery(programs, {variables: {selectedSharedProgram}})
 
-
+    const {
+		loading: reportLoading,
+		error: reportError,
+		data: reportData,
+		refetch: reportRefetch
+	} = useDataQuery(dataReportPage, {variables: {selectedSharedProgram}})
 
     useEffect(()=>{
 
@@ -158,13 +184,22 @@ export const SearchWorkerComponent = () => {
             console.log(dataProgram)
         }
     },[dataProgram])
+
     useEffect(()=>{
 
 
-        refetch({page: 1, pageSize: 50, OUs: OUs, selectedSharedProgram: selectedSharedProgram});
+        refetch({page: 1, pageSize: 200, OUs: OUs, selectedSharedProgram: selectedSharedProgram});
 
     
     },[reloadTable])
+
+    useEffect(()=>{
+        reportRefetch()
+        if (reportData){
+            console.log('reportData : ', reportData)
+        }
+
+    },[reportPage])
 
    
 	useEffect(() => {
@@ -229,7 +264,7 @@ export const SearchWorkerComponent = () => {
 				})
 			} else {
 				processData(_data, _teis);
-				setFetching('');
+				// setFetching('');
                 _data = []
                 _teis = []
 			}
@@ -276,11 +311,18 @@ export const SearchWorkerComponent = () => {
         // console.log('data3', data)
 
 		const keys = selectedSharedAttr.map(a => a.id);
-
-		keys.push({
+        //Remove the element at index 1
+        const keyIndex1 = keys[1]
+        keys.splice(1, 1);
+		keys.push(
+        {
+			name: keyIndex1,
+			weight: 0.7
+		},
+        {
 			name: 'orgUnit',
 			weight: 0.3
-		})
+		},)
 
 		const options = {
 			includeScore: true,
@@ -301,15 +343,16 @@ export const SearchWorkerComponent = () => {
 			//Proceed to match only items that are not included in any match yet (selected)
 			if (!_data.filter(_d => _d.selected).map(_d => _d.id).includes(d.id)) {
 				//Join all available TEI attributes to form search string
-				const search = keys.map(k => d[k]).filter(k => k?.length).join(' ');
+				const search = keys.map(k => d[k] ?? d[k.name]).filter(k => k?.length).join(' ');
 				const adaptedSearchTerm = search.split(' ').map(word => `${word}`).join(' | ')
 				// console.log('Adapted search', adaptedSearchTerm)
 				const fuse = new Fuse(_data, options)
 				let matches = fuse.search(adaptedSearchTerm)
 					//Filter out ignore data
 					.filter(m => d.sher1dupli1 ? d.sher1dupli1.indexOf(m.item.id) < 0 : true)
-					.filter(m => m.score < matchingSharedThresholdWeight ? Math.pow(10, -matchingSharedThresholdWeight) : 1e-32)
-				// console.log('Matches', matches)
+                    // .filter(m => m.score < 1e-32)
+					// .filter(m => m.score < matchingSharedThresholdWeight ? Math.pow(10, -matchingSharedThresholdWeight) : 1e-32)
+				// console.log('Matches', matches, adaptedSearchTerm)
 				//Filter out self from matches
 				matches = matches.filter(r => r.item.id !== d.id)
 				const result = {
@@ -333,7 +376,7 @@ export const SearchWorkerComponent = () => {
 				}
 
 				//Mark self as selected
-				_data = _data.filter(d_ => d_.id !== d.id)
+				// _data = _data.filter(d_ => d_.id !== d.id)
 
 				//Add result
 				resultObj.push(result);
@@ -343,6 +386,7 @@ export const SearchWorkerComponent = () => {
         const filteredResults = resultObj.filter(resultObj => resultObj.matches && resultObj.matches.length > 0);
         setDataItems(filteredResults)
         setpersistData(filteredResults)
+        setFetching('');
        
 	}
 
@@ -434,6 +478,7 @@ export const SearchWorkerComponent = () => {
 
     const ActionTEI = (tei, action, orgUnit='', tei_parent='', instance, match)=>{
         setSelected_tei(tei)
+        let ignore_mode= ''
         if (action === 'Open'){
             // console.log('Action: ', action)
             // console.log(baseUrl)
@@ -446,15 +491,23 @@ export const SearchWorkerComponent = () => {
         }
         if (action === 'Ignore'){
             // console.log('Action: ', action)
-            handleCreateTrackedAttribute({'tei_child': match, 'tei_parent':instance})
+            handleCreateTrackedAttribute({'tei_child': match, 'tei_parent':instance}, ignore_mode='single')
+            setPosting(true)
         }
         if (action === 'Merge'){
             console.log('Action: ', action)
             // console.log('tei_child:', tei)
             // console.log('tei_parent:', tei_parent)
             setSelectedMergingItems({'tei_child': tei, 'tei_parent':tei_parent})
+            setProcessingMergeData(true)
             setMergeAction(true)
             
+        }
+        if ( action === 'IgnoreAll'){
+
+           handleCreateTrackedAttribute({'tei_child': match, 'tei_parent':instance}, ignore_mode='multiple')
+           setPosting(true)
+
         }
         // console.log('tei: ', tei)
     }
@@ -465,8 +518,9 @@ export const SearchWorkerComponent = () => {
 
     }
 
-    const handleCreateTrackedAttribute = (teiUpdate)=>{
+    const handleCreateTrackedAttribute = (teiUpdate, ignore_mode)=>{
         let mode = ''
+        setIgnoreMode(ignore_mode)
         createMetadata(engine, IgnoreAttrMetadata, mode = 'create')
         createMetadata(engine, IgnoreAttrMetadata, mode = 'create').then(result => {
             // console.log('result: ', result)
@@ -548,6 +602,35 @@ export const SearchWorkerComponent = () => {
 
     }
 
+    const handleMatchSelectedChange = (target, parent_tei, mode) => {
+        setSelectedMatchesParent(parent_tei)
+        if (mode ==='selected'){
+            setSelectAllCheckBox(false)
+            if (selectedMatchesParent !== parent_tei){
+                setSelectedMatches([])
+            }  
+    
+            if (selectedMatches.some(entity => entity.id === target.id)) {
+                setSelectedMatches(prevSelected => prevSelected.filter(entity => entity.id !== target.id));
+            } else {
+    
+                setSelectedMatches(prevSelected => [...prevSelected, target]);
+               
+            }
+        }
+        if (mode === 'all'){
+            if(selectAllCheckBox){
+                setSelectedMatches([])
+                setSelectAllCheckBox(false) 
+            }else{
+                const extracted = target.map(entity=> ({id:entity.trackedEntity}))
+                setSelectedMatches(extracted);
+                setSelectAllCheckBox(true)
+            }
+        }
+
+    }
+
 
 
 
@@ -556,27 +639,21 @@ export const SearchWorkerComponent = () => {
 
     },[pageData,dataItems])
 
-
-
-    // console.log('persistSharedData: ', persistSharedData)
-    // console.log('filteredData: ', filteredData)
-    // console.log('filteredProjects: ', filteredProjects)
-    // console.log('pageData: ', pageData)
-    // console.log('dataItems: ', dataItems)
-    // console.log('deleted_tei: ',selectedRowDeleted)
     useEffect(()=>{
             if (deleted_tei.response === 'Successfull'){
                 setSelectedRowDeleted([...selectedRowDeleted, deleted_tei.tei]);
             }
-            // console.log('Line added')
     },[deleted_tei])
 
-
+    useEffect(()=>{
+        console.log('Merged: ', merged)
+    },[merged])
 
     return(
         <div className={classes.searchResultPage}       >
 
 	        <div className={classes.searchResultPageControls}>
+                <span>{fetching.length > 0 && (<CircularLoader small/>)}</span>
 		        <span>{fetching}</span>
 		        <Button
 			        primary
@@ -659,6 +736,27 @@ export const SearchWorkerComponent = () => {
                                                                     {i18n.t('Delete')}
                                                                 </Tag>
                                                             </span>
+                                                            <button
+                                                                className={classes.customImageContainer}
+                                                                onClick={() => { ActionTEI(instance.trackedEntity, 'IgnoreAll', instance.orgUnit, instance.trackedEntity, instance)  }}
+                                                                style={{marginLeft: '5px', color: 'red', cursor: selectedRowDeleted.some(item => item === instance.trackedEntity) ? 'not-allowed' : 'pointer', 
+                                                                        padding:(selectedMatchesParent !== instance.trackedEntity) || (selectedMatches.length === 0) ? '0px' : '5px'
+                                                                        }}
+                                                                disabled={(selectedMatchesParent !== instance.trackedEntity) || (selectedMatches.length === 0)}
+                                                                primary={(selectedMatchesParent !== instance.trackedEntity) || (selectedMatches.length === 0)}
+                                                                secondary={!((selectedMatchesParent !== instance.trackedEntity) || (selectedMatches.length === 0))}
+                                                                >
+                                                                <Tag
+                                                                    icon={<IconThumbDown16 />}
+                                                                >
+                                                                    {i18n.t('Ignore All Selected')}
+                                                                </Tag>
+                                                            </button>
+                                                            <span
+                                                                className={classes.customImageContainer}>
+                                                                    {isPosting && (<CircularLoader small/>)}
+                                                            </span>
+                                                            
                                                       
                                                         {/* <Pagination
                                                             // onPageChange={logOnPageChange}
@@ -671,6 +769,17 @@ export const SearchWorkerComponent = () => {
                                                         <DataTable scrollHeight={scrollHeight} className={`${classes.dataTableMargin}`}>
                                                         <TableHead large={true}>
                                                         <DataTableRow>
+                                                        <DataTableColumnHeader  fixed top="0"> 
+                                                            <Checkbox 
+                                                            checked={(selectedMatchesParent === instance.trackedEntity) && (selectedMatches.length !== 0) && (selectAllCheckBox === true)}
+                                                            onChange={() => {
+                                                                                handleMatchSelectedChange(instance.matches, instance.trackedEntity, 'all')
+                                                                                
+                                                                            }}
+                                                            
+                                                            />  
+                                                            
+                                                        </DataTableColumnHeader>
                                                         <DataTableColumnHeader  fixed top="0"> OrgUnit </DataTableColumnHeader>
 
                                                                         {selectedSharedAttr.map(header => (
@@ -688,6 +797,9 @@ export const SearchWorkerComponent = () => {
                                                             
                                                                     {instance.matches.length > 0 && instance.matches.map(match => ( 
                                                                             <DataTableRow id={match.trackedEntity} key={match.trackedEntity} className={(selectedRowDeleted.some(item => item === match.trackedEntity) ? ` ${classes.deletedItem}` : '')}>
+                                                                            <DataTableCell><Checkbox checked={selectedMatches.some(attr => attr.id === match.trackedEntity)}
+                                                                                                onChange={() => handleMatchSelectedChange({ id:match.trackedEntity }, instance.trackedEntity, 'selected')}
+                                                                                /> </DataTableCell>
                                                                             <DataTableCell>{match.orgUnit}</DataTableCell>
                                                                             {selectedSharedAttr.map(attr => {
                                                                                     const attribute = match.attributes.find(a => a.displayName === attr.displayName.replace(selectedSharedProgramName.displayName + ' ', ''));
@@ -731,33 +843,47 @@ export const SearchWorkerComponent = () => {
                                                                                         {i18n.t('Delete')}
                                                                                     </Tag>
                                                                                 </span>
-                                                                                <span
-                                                                                    className={classes.customImageContainer}
-                                                                                    onClick={() => { if (!selectedRowDeleted.some(item => item === match.trackedEntity)) {
-                                                                                        ActionTEI(match.trackedEntity, 'Merge', match.orgUnit, instance.trackedEntity);
-                                                                                        }  }}
-                                                                                            style={{marginLeft: '5px', color: 'red', cursor: selectedRowDeleted.some(item => item === match.trackedEntity) ? 'not-allowed' : 'pointer'}}
-                                                                                            disabled={selectedRowDeleted.some(item => item === match.trackedEntity)}>
-                                                                                    <Tag
-                                                                                        icon={<IconLink16 color='green' />}
-                                                                                    >
-                                                                                        {i18n.t('Merge')}
-                                                                                    </Tag>
-                                                                                </span>
-                                                                                <span
-                                                                                    className={classes.customImageContainer}
-                                                                                    onClick={() => { 
-                                                                                        if (!selectedRowDeleted.some(item => item === match.trackedEntity)) {
-                                                                                        ActionTEI(match.trackedEntity, 'Ignore', match.orgUnit, instance.trackedEntity, instance, match);
-                                                                                        }  }}
-                                                                                            style={{marginLeft: '5px', color: 'red', cursor: selectedRowDeleted.some(item => item === match.trackedEntity) ? 'not-allowed' : 'pointer'}}
-                                                                                            disabled={selectedRowDeleted.some(item => item === match.trackedEntity)}>
-                                                                                    <Tag
-                                                                                        icon={<IconThumbDown16 />}
-                                                                                    >
-                                                                                        {i18n.t('Ignore')}
-                                                                                    </Tag>
-                                                                                </span>
+                                                                                <button
+                                                                                    style={{marginLeft: '5px'}}
+                                                                                    disabled={selectedRowDeleted.some(item => item === match.trackedEntity) || merged.some(tei=> tei === match.trackedEntity) === true}
+                                                                                >
+                                                                                    <span
+                                                                                        className={classes.customImageContainer}
+                                                                                        onClick={() => { if (!selectedRowDeleted.some(item => item === match.trackedEntity)) {
+                                                                                            ActionTEI(match.trackedEntity, 'Merge', match.orgUnit, instance.trackedEntity);
+                                                                                            }  }}
+                                                                                                style={{marginLeft: '5px', color: 'red', cursor: (selectedRowDeleted.some(item => item === match.trackedEntity)) || (merged.some(tei=> tei === match.trackedEntity) === true) ? 'not-allowed' : 'pointer'}}
+                                                                                                >
+                                                                                        <Tag
+                                                                                            icon={<IconLink16 color='green' />}
+                                                                                        >
+                                                                                            {i18n.t('Merge')}
+                                                                                        </Tag>
+                                                                                    </span>
+                                                                                    
+                                                                                </button>
+                                                                                <button
+                                                                                    style={{marginLeft: '5px'}}
+                                                                                    disabled={selectedRowDeleted.some(item => item === match.trackedEntity)}
+                                                                                >
+
+                                                                                    <span
+                                                                                        className={classes.customImageContainer}
+                                                                                        onClick={() => { 
+                                                                                            if (!selectedRowDeleted.some(item => item === match.trackedEntity)) {
+                                                                                            ActionTEI(match.trackedEntity, 'Ignore', match.orgUnit, instance.trackedEntity, instance, match);
+                                                                                            }  }}
+                                                                                                style={{marginLeft: '5px', color: 'red', cursor: selectedRowDeleted.some(item => item === match.trackedEntity) ? 'not-allowed' : 'pointer'}}
+                                                                                                >
+                                                                                        <Tag
+                                                                                            icon={<IconThumbDown16 />}
+                                                                                        >
+                                                                                            {i18n.t('Ignore')}
+                                                                                        </Tag>
+                                                                                    </span>
+
+                                                                                </button>
+                                                                                
 
 
 
@@ -896,8 +1022,9 @@ export const SearchWorkerComponent = () => {
                 
                 />}
 
-        {mergeAction && <MergeComponent setMergeAction={setMergeAction} selectedMergingItems={selectedMergingItems}/>}
-        {IgnoreAction && <TrackEntityData teiUpdate={teiUpdate} trackedEntityType={trackedEntityType} setIgnoreAction={setIgnoreAction}/>}
+        {mergeAction && <MergeComponent setMergeAction={setMergeAction} selectedMergingItems={selectedMergingItems} setProcessingMergeData={setProcessingMergeData} processingMergeData={processingMergeData} reportPage={reportPage} setReportPage={setReportPage} merged={merged} setMerged={setMerged}/>}
+        {IgnoreAction && (IgnoreMode === 'single') && <TrackEntityData teiUpdate={teiUpdate} setPosting={setPosting}/>}
+        {IgnoreAction && (IgnoreMode === 'multiple') && <TrackEntityDataMultiple teiUpdate={teiUpdate} trackedEntityType={trackedEntityType} selectedMatches={selectedMatches} setPosting={setPosting}/>}
         </div>
     )
 }

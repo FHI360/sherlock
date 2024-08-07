@@ -1,7 +1,8 @@
 import React, { createContext,  useState, useCallback} from 'react';
-import search from './icons/search.png'
-import refresh from './icons/refresh.png'
 import classes from './App.module.css'
+import refresh from './icons/refresh.png'
+import search from './icons/search.png'
+import { match_threshold, match_threshold_weight } from './consts'; 
 
 
 export const customImage = (source, size='small') => {
@@ -19,6 +20,7 @@ export const customImage = (source, size='small') => {
 }
 
 export const createOrUpdateDataStore = async (engine, postObject, store, key, mode='') =>{
+  console.log('Saving: ', postObject)
 
   if (!postObject.hasOwnProperty('modifiedDate')) {
       // If it doesn't exist, add it to the object
@@ -72,23 +74,127 @@ export const createMetadata = async (engine, postObject, mode)=>{
     }
 }
 
+export const mergeTrackedEntities = async (engine, payload) => {
+
+  			// engine.mutate(trackerMutation, {variables: {payload}})
+        console.log('payload is  : ',payload)
+        const mode = 'update'
+        try {
+          const response = await engine.mutate({
+            resource: 'tracker',
+            type: mode ? 'create' : 'update',
+            partial: true,
+            // async:false,
+            data : payload
+          });
+          console.log('response: ',response)
+          console.log('report: ',response.response.location+'/report')
+          return(response.response.id)
+
+          // setReportPage(response.response.id)
+          // setMergeAction(false)
+          // show({msg: response.response.location+'/report', type: 'warning'})
+  
+        } catch (error) {
+          console.error('trackedEntity error response: ' +  error);
+          return('')
+        }
+}
+export const updateTrackedEntityIgnoreAll = async (engine, tei_value, payload, trackedEntityType, selectedMatches) => {
+  console.log('payload: ', payload)
+  console.log('tei_value:', tei_value)
+  console.log('selectedMatches', selectedMatches)
+  selectedMatches
+  let nestedPayload = {}
+  let trackedEntities = []
+
+
+
+  payload.forEach(entity => {
+        const selectedTei = selectedMatches.some(item => item.id === entity.trackedEntity)
+        if (selectedTei){
+          let ignoreAttr =  {
+            "attribute": "sher1dupli1",
+            "displayName": "Ignored duplicate",
+            "valueType": "LONG_TEXT"  
+          }
+  
+  
+          const exist = entity.attributes.filter(attr => attr.attribute === "sher1dupli1") || []
+  
+          if (exist.length > 0){
+              console.log('entity: ', entity)
+              const existIgnoredValues = exist.map(item => item.value);
+              const existIgnoredValuesAndNew = `${existIgnoredValues[0]};${tei_value.trackedEntity}`
+                  // Remove all instances of "sher1dupli1"
+              entity.attributes = entity.attributes.filter(attr => attr.attribute !== "sher1dupli1");
+              ignoreAttr.value = removeDuplicates(existIgnoredValuesAndNew);  
+          }else{
+              // Remove all instances of "sher1dupli1"
+              entity.attributes = entity.attributes.filter(attr => attr.attribute !== "sher1dupli1");
+              ignoreAttr.value = tei_value.trackedEntity;  
+          }      
+          entity.attributes.push(ignoreAttr)
+          entity.trackedEntityType = trackedEntityType
+          trackedEntities.push(entity);
+
+        }
+
+  })
+
+  console.log('trackedEntities: ',trackedEntities)
+  const mapped_trackedEntities = trackedEntities.map(entity => entity.trackedEntity);
+  tei_value.attributes.push({
+    "attribute": "sher1dupli1",
+    "displayName": "Ignored duplicate",
+    "valueType": "LONG_TEXT",
+    "value": mapped_trackedEntities.join(';')
+  })
+  const parent_entity = {
+    "trackedEntity": tei_value.trackedEntity,
+    "orgUnit": tei_value.orgUnit,
+    "attributes": tei_value.attributes,
+    "trackedEntityType": trackedEntityType
+  }
+  trackedEntities.push(parent_entity);
+  // tei_value, payload
+  nestedPayload = {
+
+    "trackedEntities": trackedEntities
+    // "enrollments": payload.enrollments,
+    // "events": events,
+    // "relationships": payload?.relationships || []
+  }
+
+  console.log('nestedPayload: ', nestedPayload)
+  const mode = 'update'
+  try {
+    const response = await engine.mutate({
+          resource: 'tracker',
+          type: mode ? 'create' : 'update',
+          partial: true,
+          // async:false,
+          data : nestedPayload
+
+      });
+      console.log('trackedEntity update response:', response);
+      
+      // successMessage();
+      //handleCloseModal();
+  } catch (error) {
+      // errorMessage(error)
+      console.error('trackedEntity error response: ' +  error);
+  }
+  // payload.length = 0;
+  // console.log('payload after processing: ', payload);
+  return true
+}
+
 export const updateTrackedEntityIgnore = async (engine, teiUpdate, tei_value, payload) => {
    // get the values of the json object
   const ignore_values = Object.values(teiUpdate);
-  console.log('******** ignore_values **********')
-  console.log(ignore_values)
-  // if ('score' in tei_value || 'matches' in tei_value) {
-  //   if ('score' in tei_value) {
-  //       delete tei_value.score;
-  //   }
-  //   if ('matches' in tei_value) {
-  //       delete tei_value.matches;
-  //   }
-  // }
-
   const trackedEntities = ignore_values.map(item => item.trackedEntity);
-    console.log(trackedEntities)
-    const ignoreAttr =  {
+    let ignoreAttr =  {
         "attribute": "sher1dupli1",
         "displayName": "Ignored duplicate",
         "valueType": "LONG_TEXT",
@@ -97,13 +203,18 @@ export const updateTrackedEntityIgnore = async (engine, teiUpdate, tei_value, pa
     }
 
 
-  console.log('ignoreAttr: ', ignoreAttr); 
   const exist = payload.enrollments[0].attributes.filter(attr => attr.attribute === "sher1dupli1") || []
+
+    if (exist.length > 0){
+      const existIgnoredValues = exist.map(item => item.value);
+      console.log('removeDuplicates(existIgnoredValues[0]): ', removeDuplicates(existIgnoredValues[0]))
+      const existIgnoredValuesAndNew = `${existIgnoredValues[0]};${tei_value.trackedEntity}`
+      ignoreAttr.value = removeDuplicates(existIgnoredValuesAndNew);
+    }
+
   // if (exist.length === 0){
           payload.enrollments[0].attributes.push(ignoreAttr)
-          console.log('payload:', payload)
           const events = payload?.enrollments[0]?.events || [];
-          console.log('events:', events)
 
           if ('events' in payload.enrollments[0]){
             delete payload.enrollments[0].events;
@@ -149,16 +260,25 @@ export const updateTrackedEntityIgnore = async (engine, teiUpdate, tei_value, pa
 
               });
               console.log('trackedEntity update response:', response);
-              // successMessage();
-              //handleCloseModal();
           } catch (error) {
-              // errorMessage(error)
               console.error('trackedEntity error response: ' +  error);
           }
   // } 
 }
 
-export const delete_tei = async (engine, tei) => {
+export const removeDuplicates = (inputString) => {
+  // Split the string by ';'
+  const array = inputString.split(';');
+  
+  // Create a Set to remove duplicates
+  const uniqueArray = [...new Set(array)];
+  
+  // Join the array back into a string
+  return uniqueArray.join(';');
+};
+
+  
+  export const delete_tei = async (engine, tei) => {
 
   try {
     const response = await engine.mutate({
@@ -239,12 +359,12 @@ export const SharedStateContext = createContext({
   setSelectedSharedProgramName: () => {},
   selectedOUSharedforQuery: [],
   setSelectedSharedOUforQuery: () => {},
-  matchingSharedThreshold: 0.6,
+  matchingSharedThreshold: match_threshold,
   setMatchingSharedThreshold:() => {},
-  matchingSharedThresholdWeight: 1e-20,
+  matchingSharedThresholdWeight: match_threshold_weight,
   setMatchingSharedThresholdWeight:() => {},
   persistSharedData: [],
-  setPersistSharedData:() => {},
+  setPersistSharedData:() => {}
 
 })
 
@@ -255,8 +375,8 @@ export const useSharedState = () => {
   const [selectedSharedProgramName,setSelectedSharedProgramName_] = useState([]);
   const [selectedOUSharedforQuery, setSelectedSharedOUforQuery_] = useState([]);
   const [fullOrgUnitSharedSearch, setFullOrgUnitSharedSearch_] = useState(false);
-  const [matchingSharedThreshold, setMatchingSharedThreshold_] = useState(0.6);
-  const [matchingSharedThresholdWeight, setMatchingSharedThresholdWeight_] = useState(1e-20);
+  const [matchingSharedThreshold, setMatchingSharedThreshold_] = useState(match_threshold);
+  const [matchingSharedThresholdWeight, setMatchingSharedThresholdWeight_] = useState(match_threshold_weight);
   const [persistSharedData, setPersistSharedData_] = useState([]);
   
   
@@ -294,6 +414,7 @@ export const useSharedState = () => {
   const setPersistSharedData = useCallback((data) => {
     setPersistSharedData_(data)
   }, [])
+ 
 
   return {
     selectedSharedOU,
