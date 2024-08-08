@@ -45,7 +45,7 @@ const trackedEntityInstances = {
             orgUnit: fullOrgUnitSharedSearch ? rootOU : OUs,
             orgUnitMode: fullOrgUnitSharedSearch ? 'ALL' : 'SELECTED',
             program: selectedSharedProgram,
-            fields: "trackedEntity, attributes, orgUnit",
+            fields: "trackedEntity, attributes, orgUnit, inactive",
             totalPages: true,
             pageSize: pageSize,
             page: page
@@ -227,7 +227,7 @@ export const SearchWorkerComponent = () => {
 				refetch({page: page, pageSize: pageSize, OUs: OUs, selectedSharedProgram: selectedSharedProgram});
 
 
-				const teis = data?.targetedEntity?.instances || []
+				const teis = (data?.targetedEntity?.instances || []).filter(tei => tei.inactive !== true)
 				_teis.push(...teis);
 
 				//Flatten TEI attributes to object attribute
