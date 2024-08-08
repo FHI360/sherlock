@@ -1,30 +1,35 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useDataQuery, useDataEngine, useAlert, useConfig } from '@dhis2/app-runtime'
-import { SharedStateContext, createOrUpdateDataStore, generateRandomId, modifiedDate, delete_tei, customImage ,createMetadata, updateTrackedEntityIgnore  } from '../utils'
-import { config, SearchHistory, IgnoreAttrMetadata, IgnoreAttrMetadataProvisioning} from '../consts'
+import { useAlert, useConfig, useDataEngine, useDataQuery } from '@dhis2/app-runtime'
+import { createMetadata, createOrUpdateDataStore, delete_tei, modifiedDate, SharedStateContext } from '../utils'
+import { config, IgnoreAttrMetadata, IgnoreAttrMetadataProvisioning } from '../consts'
 import classes from '../App.module.css'
 import { CircularLoader } from '@dhis2-ui/loader'
-import { IconSave24, IconDownload24 } from '@dhis2/ui-icons'
+import { IconDelete16, IconLaunch16, IconLink16, IconSave24, IconThumbDown16 } from '@dhis2/ui-icons'
 import i18n from '@dhis2/d2-i18n'
-import { IconLaunch16, IconDelete16, IconLink16, IconThumbDown16} from '@dhis2/ui-icons'
 import ActionConfirmation from './ActionConfirmation'
 import MergeComponent from './MergeComponent'
 import TrackEntityData from './TrackEntityData'
 import TrackEntityDataMultiple from './TrackEntityDataMultiple'
 
 import {
-    DataTable,
-    DataTableFoot,
-    DataTableBody,
-    DataTableRow,
-    DataTableCell,
-    DataTableColumnHeader,
-    TableHead, TableBody,  Button,
-    Modal, ModalTitle, ModalContent, ModalActions, ButtonStrip, Pagination, Tag, Checkbox
-  } from '@dhis2/ui'
-  import { Input } from '@dhis2-ui/input'
-  import Fuse from 'fuse.js';
-
+	Button,
+	ButtonStrip,
+	Checkbox,
+	DataTable,
+	DataTableBody,
+	DataTableCell,
+	DataTableColumnHeader,
+	DataTableRow,
+	Modal,
+	ModalActions,
+	ModalContent,
+	ModalTitle,
+	Pagination,
+	TableHead,
+	Tag
+} from '@dhis2/ui'
+import { Input } from '@dhis2-ui/input'
+import Fuse from 'fuse.js';
 
 
 //api/trackedEntityInstances.json?ou=nLbABkQlwaT&program=FVhEHQDNfxm
@@ -303,6 +308,23 @@ export const SearchWorkerComponent = () => {
 
     },[persistData])
 
+
+	const getExponent = (num) => {
+		// Convert the number to a string
+		const numStr = num.toString();
+
+		// Check if the number has an exponent part by looking for 'e' or 'E'
+		const exponentIndex = numStr.toLowerCase().indexOf('e');
+
+		// If there's no exponent part, return 0
+		if (exponentIndex === -1) {
+			return 0;
+		}
+
+		// Extract the exponent part and convert it to an integer
+		return Math.abs(parseInt(numStr.slice(exponentIndex + 1), 10));
+	}
+
     
 	const processData = (data, teis) => {
 		setFetching('Matching...');
@@ -370,7 +392,7 @@ export const SearchWorkerComponent = () => {
 
 						return {
 							...match,
-							score: m.score
+							score: getExponent(m.score)
 						}
 					})
 				}
