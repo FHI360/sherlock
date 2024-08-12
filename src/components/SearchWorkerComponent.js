@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useAlert, useConfig, useDataEngine, useDataQuery } from '@dhis2/app-runtime'
 import { createMetadata, createOrUpdateDataStore, delete_tei, modifiedDate, SharedStateContext } from '../utils'
-import { config, IgnoreAttrMetadata, IgnoreAttrMetadataProvisioning } from '../consts'
+import { config, IgnoreAttrMetadata, IgnoreAttrMetadataProvisioning, score_description } from '../consts'
 import classes from '../App.module.css'
 import { CircularLoader } from '@dhis2-ui/loader'
 import { IconDelete16, IconLaunch16, IconLink16, IconSave24, IconThumbDown16 } from '@dhis2/ui-icons'
@@ -810,7 +810,7 @@ export const SearchWorkerComponent = () => {
                                                                             </DataTableColumnHeader>
                                                                         )) || []}
 
-                                                                        <DataTableColumnHeader  fixed top="0"> {i18n.t('Score:')} <span style={{marginLeft: '2px', fontStyle:'italic'}}> {i18n.t('lower score represents stronger match')}</span></DataTableColumnHeader>
+                                                                        <DataTableColumnHeader  fixed top="0"> {i18n.t('Score:')} <span style={{marginLeft: '2px', fontStyle:'italic'}}> {i18n.t(score_description)}</span></DataTableColumnHeader>
 
                                                             </DataTableRow>
 
