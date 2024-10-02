@@ -155,17 +155,16 @@ export const Main = () => {
         if (checkProgrammName.length > 0){
             handleSaveorUpdateRecord(dataStoreProfileExist ? 'update' : 'create', selectedAttr);
         }
-    },[matchingThreshold, matchingThresholdWeight])
+    },[matchingThreshold, matchingThresholdWeight, selectedAttr, selectedOU])
     
     useEffect(()=>{
         handleSaveorUpdateRecord(dataStoreProfileExist ? 'update' : 'create', selectedAttr);
-    }, [fullOrgUnitSearch])
+    }, [fullOrgUnitSearch, selectedAttr, selectedOU])
     /***
      * Org Units Selection Function. Responsible populating OrgUnitsSelected with selected OrgUnits
      * 
      */
     const handleOUChange = event => {
-        console.log(event.selected)
         setSelectedOU(event.selected)
         setSelectedOUSave(true)
         sharedState.setSelectedSharedProgram(selectedProgram)
@@ -239,7 +238,7 @@ export const Main = () => {
     function constant(){
 
         setProgramAttributeSave(false)
-        setProgramAttribute(false);
+        // setProgramAttribute(false);
         setProgramAttributeExpand(true);
         // setSelectedAttr([])
     }
@@ -296,7 +295,7 @@ export const Main = () => {
                                     selectedOU={selectedOU}
                                     selectedProgramName={selectedProgramName?.displayName || []}
                                 />
-                                        {selectedProgram.length > 0 && dataStoreProfileExist && selectedOUsave && <div className={classes.updateSaveProgramAttributeBtn}>
+                                        {/* {selectedProgram.length > 0 && dataStoreProfileExist && selectedOUsave && <div className={classes.updateSaveProgramAttributeBtn}>
                                             <Chip
                                                 className={classes.customImageContainer}
                                                 icon={ <IconSave24 alt="SaveAttributes"/>}
@@ -315,7 +314,7 @@ export const Main = () => {
                                                     )
                                                 }
                                             </Chip>
-                                        </div>}
+                                        </div>} */}
                             </div>
                             <div style={{ width:'100%'}}>                                
                                 <div className={classes.headerTitle}>
@@ -459,7 +458,7 @@ export const Main = () => {
                                                     ))}
                                                 </TableBody>
                                         </Table>}
-                                        {selectedProgram.length > 0 && showProgramAttributesSave && <div className={classes.updateSaveProgramAttributeBtn}>
+                                        {/* {selectedProgram.length > 0 && showProgramAttributesSave && <div className={classes.updateSaveProgramAttributeBtn}>
                                             <Chip
                                                 className={classes.customImageContainer}
                                                 icon={ <IconSave24 alt="SaveAttributes"/>}
@@ -481,7 +480,7 @@ export const Main = () => {
 
 
                                             </Chip>
-                                        </div>}
+                                        </div>} */}
                                         </div>
                                     </div>
                                 </div>
