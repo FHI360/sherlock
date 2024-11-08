@@ -9,8 +9,9 @@ import { config, MainTitle, searchBoundarySelected, searchBoundaryfull, panelAct
 import { generateRandomId, modifiedDate, createOrUpdateDataStore, provisionOUs } from '../../utils';
 import { useDataEngine } from '@dhis2/app-runtime';
 import { Chip } from '@dhis2-ui/chip'
+import { Checkbox } from '@dhis2-ui/checkbox';
 
-import { IconSave24, IconChevronDown24, IconChevronRight24, IconInfo16 } from '@dhis2/ui-icons'; 
+import { IconSave24, IconChevronDown24, IconChevronRight24, IconInfo16 } from '@dhis2/ui-icons';
 import ProgramComponent from '../ProgramComponent';
 import ProjectAttributeComponent from '../ProjectAttributeComponent';
 import Thresholdinput from '../Thresholdinput';
@@ -40,7 +41,7 @@ export const Main = () => {
         ({ msg }) => msg,
         ({ type }) => ({ [type]: true })
       )
-    
+
     const engine = useDataEngine();
     const sharedState = useContext(SharedStateContext)
 
@@ -52,10 +53,11 @@ export const Main = () => {
         selectedSharedProgramName,
         matchingSharedThreshold,
         matchingSharedThresholdWeight,
-        persistSharedData
+        persistSharedData,
+        exactMatching
       } = sharedState
-    
-    // console.log('+++++ Main.js ++++++') 
+
+    // console.log('+++++ Main.js ++++++')
     // console.log('selectedSharedOU',selectedSharedOU)
     // console.log('selectedSharedAttr',selectedSharedAttr)
     // console.log('selectedSharedProgram',selectedSharedProgram)
@@ -71,7 +73,7 @@ export const Main = () => {
     const [selectedAttr,setSelectedAttr] = useState(selectedSharedAttr);
     const [selectedProgram,setSelectedProgram] = useState(selectedSharedProgram);
     const [fullOrgUnitSearch, setFullOrgUnitSearch] = useState(false);
-    const [selectedProgramName,setSelectedProgramName] = useState(selectedSharedProgramName?.displayName || []);    
+    const [selectedProgramName,setSelectedProgramName] = useState(selectedSharedProgramName?.displayName || []);
     const [matchingThreshold, extSetMatchThresh] = useState(matchingSharedThreshold);
     const [matchingThresholdWeight, extSetMatchThreshholdWeight] = useState(matchingSharedThresholdWeight);
 
@@ -83,20 +85,21 @@ export const Main = () => {
     const [selectedOUsave, setSelectedOUSave] = useState(false);
     const [selectedOUforQuery, setSelectedOUforQuery] = useState(false);
     const [scrollHeight, setScrollHeight] = useState('350px');
-    
+    const [exactMatch, setExactMatch] = useState(exactMatching);
+
     // if (error) {
 
     //     return <span>ERROR: {error?.message}</span>;
     // }
-    
+
     // if (loading) {
     //     return <span>Loading...</span>;
     // }
     useEffect(() => {
 
         setSelectedOUforQuery(provisionOUs(selectedOU))
-        
-    }, [selectedOU]); 
+
+    }, [selectedOU]);
 
     useEffect(() => {
 		const adjustScrollHeight = () => {
@@ -128,25 +131,25 @@ export const Main = () => {
         }
         if (selectedSharedAttr.length > 0){
             setSelectedAttr(selectedSharedAttr)
-            
+
         }
         if (selectedSharedProgram.length > 0){
             setSelectedProgram(selectedSharedProgram)
             setSelectedProgramName(selectedSharedProgramName)
-  
-            
+
+
         }
         if (fullOrgUnitSharedSearch){
             setFullOrgUnitSearch(fullOrgUnitSharedSearch)
-            
+
         }
         if (matchingSharedThreshold !== null){
             extSetMatchThresh(matchingSharedThreshold)
-            
+
         }
         if (matchingSharedThresholdWeight !== null){
             extSetMatchThreshholdWeight(matchingSharedThresholdWeight)
-            
+
         }
 
 
@@ -156,15 +159,16 @@ export const Main = () => {
     useEffect(()=> {
         sharedState.setMatchingSharedThreshold(matchingThreshold)
         sharedState.setMatchingSharedThresholdWeight(matchingThresholdWeight)
+        sharedState.setExactMatching(exactMatch);
         const checkProgrammName = selectedProgramName?.displayName || []
         if (checkProgrammName.length > 0){
             handleSaveorUpdateRecord(dataStoreProfileExist ? 'update' : 'create', selectedAttr);
         }
-    },[matchingThreshold, matchingThresholdWeight])
-    
+    },[matchingThreshold, matchingThresholdWeight, exactMatch])
+
     /***
      * Org Units Selection Function. Responsible populating OrgUnitsSelected with selected OrgUnits
-     * 
+     *
      */
     const handleOUChange = event => {
         console.log(event.selected)
@@ -175,7 +179,7 @@ export const Main = () => {
 
     /***
      * Attribute Change Function. Responsible for checkbox functions for attribute
-     * 
+     *
      */
     const handleAttrChange = (target) => {
         setProgramAttributeSave(true)
@@ -190,8 +194,8 @@ export const Main = () => {
     }
 
     /***
-     * Update Attribute record 
-     * 
+     * Update Attribute record
+     *
      */
     const handleSaveorUpdateRecord = async (action, data) => {
 
@@ -208,13 +212,14 @@ export const Main = () => {
                 fullOrgUnitSearch:fullOrgUnitSearch,
                 matchingThreshold:matchingThreshold,
                 matchingThresholdWeight:matchingThresholdWeight,
-                modifiedDate:modifiedDate(),  
-            };    
-            try {                
+                exactMatching: exactMatch,
+                modifiedDate:modifiedDate(),
+            };
+            try {
                 createOrUpdateDataStore(engine, projectData, config.dataStoreName, selectedProgram, action);
                 setDataStoreProfile(true)
-                constant();         
-            } catch (error) {                
+                constant();
+            } catch (error) {
                 console.error('Error saving to project:', error);
             }
         }
@@ -229,6 +234,7 @@ export const Main = () => {
         sharedState.setSelectedSharedOUforQuery(selectedOUforQuery)
         sharedState.setMatchingSharedThreshold(matchingThreshold)
         sharedState.setMatchingSharedThresholdWeight(matchingThresholdWeight)
+        sharedState.setExactMatching(exactMatch);
         navigate('/results');
         // history.push('/edit')
     }
@@ -243,7 +249,7 @@ export const Main = () => {
 
 
     return(
-                <div>            
+                <div>
                     <div className={classes.container}>
                         {/* <div className={classes.topnav}>
                             <a href="#home">Home</a>
@@ -254,8 +260,8 @@ export const Main = () => {
 
                         <div className={classes.middle} >
                             <div className={classes.sidenav}>
-                                <OrganisationUnitComponent 
-                                    handleOUChange={handleOUChange} 
+                                <OrganisationUnitComponent
+                                    handleOUChange={handleOUChange}
                                     selectedOU={selectedOU}
                                     selectedProgramName={selectedProgramName?.displayName || []}
                                 />
@@ -266,11 +272,11 @@ export const Main = () => {
                                                 onClick={() => {
                                                     handleSaveorUpdateRecord(dataStoreProfileExist ? 'update' : 'create', selectedAttr);
                                                 }}
-                                                overflow 
+                                                overflow
                                                 selected
                                                 style={{ marginLeft: '10px' }}
-                                            >  
-                                                { 
+                                            >
+                                                {
                                                     selectedOUsave && dataStoreProfileExist ? (
                                                     'Update OU Search List'
                                                         ) : (
@@ -280,109 +286,120 @@ export const Main = () => {
                                             </Chip>
                                         </div>}
                             </div>
-                            <div style={{ width:'100%'}}>                                
+                            <div style={{ width:'100%'}}>
                                 <div className={classes.headerTitle}>
                                     <h2>{MainTitle}</h2>
-                                    
+
                                     <span>
                                         {panelAction}
                                     </span>
                                 </div>
-                                <div className={classes.main}>                
+                                <div className={classes.main}>
                                     <div className={classes.panelmiddle}>
-                                        <span style={{fontWeight:'bold' }}> {i18n.t('Select program')}</span>
-                                        <div style={{marginTop: '10px' }}>
-                                            <ProgramComponent 
-                                                selectedProgram={selectedProgram}                                             
+                                        <span style={{fontWeight: 'bold'}}> {i18n.t('Select program')}</span>
+                                        <div style={{marginTop: '10px'}}>
+                                            <ProgramComponent
+                                                selectedProgram={selectedProgram}
                                                 setSelectedProgram={setSelectedProgram}
                                                 setSelectedProgramName={setSelectedProgramName}
                                                 setDataStoreProfile={setDataStoreProfile}
                                             />
                                         </div>
-                                        
-                                        <div style={{marginTop: '20px' }}>
-                                            <ThresholdInput matchingThreshold={matchingThreshold} 
-                                                            extSetMatchThresh={extSetMatchThresh}
-                                                            dataStoreProfileExist={dataStoreProfileExist}
-                                                            selectedProgramName={selectedProgramName}
-                                                            showProgramAttributesSave={showProgramAttributesSave}
-                                                            selectedAttr={selectedAttr}
-                                                            matchingThresholdWeight={matchingThresholdWeight}
-                                                            extSetMatchThreshholdWeight={extSetMatchThreshholdWeight}
-                                                            scrollHeight={scrollHeight}
-
-                                                            />
-                                            </div>
-                                        
-
-                                        {selectedProgram.length > 0 && 
-                                        <div className={classes.RuleDescription}>
-                                            <span><IconInfo16/></span>
-                                            <span style={{marginLeft:'5px'}}>
-                                                <span style={{fontSize:'14px', fontWeight:'bold'}}>{i18n.t('Rule Description:')}</span> <br></br>
-                                                <span style={{fontSize:'11px'}}>
-                                                        {i18n.t('Sherlock will search for matches or near matches of the program attributes')}
-                                                </span>
-                                                 
-                                            </span>
-
+                                        {selectedProgram.length > 0 && <div style={{marginTop: '20px'}}>
+                                            <Checkbox checked={exactMatch} onChange={(value) => setExactMatch(value.checked)} label="Enable exact match" />
                                         </div>
                                         }
-                                        {selectedProgram.length > 0 && 
-                                        <div style={{ display: 'flex', marginTop: '5px' }}>
-                                            <div>
-                                                <Button 
-                                                    basic 
-                                                    onClick={handleFindDuplicates} 
-                                                    disabled={!(selectedOU.length > 0 && selectedAttr.length > 0 && selectedProgram.length > 0 && showProgramAttributesSave === false)}
-                                                    >                                                        
-                                                        {i18n.t('Find Duplicates')}
-                                                </Button>
-                                            </div>
-                                            <div style={{alignContent: 'center', marginLeft:'10px'}}>
-                                                <Switch 
-                                                    checked={fullOrgUnitSearch === false} 
-                                                    label={fullOrgUnitSearch ?  searchBoundaryfull  : searchBoundarySelected}
-                                                    onChange={() => {
-                                                        setFullOrgUnitSearch((prev) => !prev);
-                                                    }}
+                                        {!exactMatch &&
+                                            <div style={{marginTop: '20px'}}>
+                                                <ThresholdInput matchingThreshold={matchingThreshold}
+                                                                extSetMatchThresh={extSetMatchThresh}
+                                                                dataStoreProfileExist={dataStoreProfileExist}
+                                                                selectedProgramName={selectedProgramName}
+                                                                showProgramAttributesSave={showProgramAttributesSave}
+                                                                selectedAttr={selectedAttr}
+                                                                matchingThresholdWeight={matchingThresholdWeight}
+                                                                extSetMatchThreshholdWeight={extSetMatchThreshholdWeight}
+                                                                scrollHeight={scrollHeight}
+
                                                 />
                                             </div>
-                                        
-
-                                        </div>
                                         }
 
-                                    </div>
-                                    <div className={classes.panelRight}>
-                                        <span style={{fontWeight:'bold' }}>
+                                            {selectedProgram.length > 0 &&
+                                                <div className={classes.RuleDescription}>
+                                                    <span><IconInfo16/></span>
+                                                    <span style={{marginLeft: '5px'}}>
+                                                <span style={{
+                                                    fontSize: '14px',
+                                                    fontWeight: 'bold'
+                                                }}>{i18n.t('Rule Description:')}</span> <br></br>
+                                                <span style={{fontSize: '11px'}}>
+                                                        {i18n.t('Sherlock will search for matches or near matches of the program attributes')}
+                                                </span>
+
+                                            </span>
+
+                                                </div>
+                                            }
+                                            {selectedProgram.length > 0 &&
+                                                <div style={{display: 'flex', marginTop: '5px'}}>
+                                                    <div>
+                                                        <Button
+                                                            basic
+                                                            onClick={handleFindDuplicates}
+                                                            disabled={!(selectedOU.length > 0 && selectedAttr.length > 0 && selectedProgram.length > 0 && showProgramAttributesSave === false)}
+                                                        >
+                                                            {i18n.t('Find Duplicates')}
+                                                        </Button>
+                                                    </div>
+                                                    <div style={{alignContent: 'center', marginLeft: '10px'}}>
+                                                        <Switch
+                                                            checked={fullOrgUnitSearch === false}
+                                                            label={fullOrgUnitSearch ? searchBoundaryfull : searchBoundarySelected}
+                                                            onChange={() => {
+                                                                setFullOrgUnitSearch((prev) => !prev);
+                                                            }}
+                                                        />
+                                                    </div>
+
+
+                                                </div>
+                                            }
+
+                                        </div>
+                                        <div className={classes.panelRight}>
+                                        <span style={{fontWeight: 'bold'}}>
                                                 {ProjectAttributedescription}  &nbsp;
-                                                <span style={{fontWeight:'normal', fontSize: '12px'}}>
+                                            <span style={{fontWeight: 'normal', fontSize: '12px'}}>
                                                     &#40;{i18n.t('Max of 5')}&#41;
                                                 </span>
-                                                <span style={{fontWeight:'normal', fontSize: '12px', marginLeft:'50px'}}>
+                                                <span style={{
+                                                    fontWeight: 'normal',
+                                                    fontSize: '12px',
+                                                    marginLeft: '50px'
+                                                }}>
                                                 {(selectedProgram.length > 0) && <Chip
                                                     className={classes.customImageContainer}
-                                                    icon={ showProgramAttributes ? (
-                                                        <IconChevronDown24 alt="Expand" />
+                                                    icon={showProgramAttributes ? (
+                                                        <IconChevronDown24 alt="Expand"/>
                                                     ) : (
-                                                        <IconChevronRight24 alt="Collapse" />
+                                                        <IconChevronRight24 alt="Collapse"/>
                                                     )}
                                                     onClick={() => {
                                                         setProgramAttribute((prev) => !prev);
                                                         setProgramAttributeExpand((prev) => !prev);
                                                     }}
-                                                    selected={showProgramAttributesExpand}                                                   
+                                                    selected={showProgramAttributesExpand}
                                                 >
                                                     {i18n.t('Add or Remove Attributes in Duplicate Checker')}
-                                                    
+
                                                 </Chip>}
                                                 </span>
                                         </span>
-                                        <div style={{marginTop: '10px' }}>
-                                                <ProjectAttributeComponent 
-                                                    handleAttrChange={handleAttrChange} 
-                                                    selectedAttr={selectedAttr} 
+                                            <div style={{marginTop: '10px'}}>
+                                                <ProjectAttributeComponent
+                                                    handleAttrChange={handleAttrChange}
+                                                    selectedAttr={selectedAttr}
                                                     setSelectedAttr={setSelectedAttr}
                                                     selectedProgramID={selectedProgram}
                                                     extSetMatchThresh={extSetMatchThresh}
@@ -390,66 +407,70 @@ export const Main = () => {
                                                     setDataStoreProfile={setDataStoreProfile}
                                                     setSelectedOU={setSelectedOU}
                                                     extSetMatchThreshholdWeight={extSetMatchThreshholdWeight}
-                                                    
+
                                                 />
-                                        </div>
+                                            </div>
 
-                                        <div>
-
-
-                                        {!showProgramAttributes && <Table className={classes.dataTableProjectAttributes}>
-
-                                                <TableHead>
-                                                    <TableRowHead>
-                                                        <TableCellHead>{i18n.t('Attribute Name')}</TableCellHead>
-                                                        <TableCellHead>{i18n.t('Priority')}</TableCellHead>
-                                                    </TableRowHead>
+                                            <div>
 
 
-                                                </TableHead>
+                                                {!showProgramAttributes &&
+                                                    <Table className={classes.dataTableProjectAttributes}>
 
-                                                <TableBody>
-                                                    {selectedAttr.map(attr => (
+                                                        <TableHead>
+                                                            <TableRowHead>
+                                                                <TableCellHead>{i18n.t('Attribute Name')}</TableCellHead>
+                                                                <TableCellHead>{i18n.t('Priority')}</TableCellHead>
+                                                            </TableRowHead>
 
-                                                                <TableRow key={attr.id} className={classes.customTableRow}>
-                                                                    <TableCell className={classes.customTableCell}>{attr.displayName}</TableCell>
+
+                                                        </TableHead>
+
+                                                        <TableBody>
+                                                            {selectedAttr.map(attr => (
+
+                                                                <TableRow key={attr.id}
+                                                                          className={classes.customTableRow}>
+                                                                    <TableCell
+                                                                        className={classes.customTableCell}>{attr.displayName}</TableCell>
                                                                     <TableCell className={`${classes.customTableCell}`}>Refouse
                                                                     </TableCell>
                                                                 </TableRow>
-                                                            
-
-                                                    ))}
-
-                                                </TableBody>
-                                        </Table>}
-                                        {selectedProgram.length > 0 && showProgramAttributesSave && <div className={classes.updateSaveProgramAttributeBtn}>
-                                            <Chip
-                                                className={classes.customImageContainer}
-                                                icon={ <IconSave24 alt="SaveAttributes"/>}
-                                                onClick={() => {
-                                                    handleSaveorUpdateRecord(dataStoreProfileExist ? 'update' : 'create', selectedAttr);
-                                                }}
-                                                overflow 
-                                                selected
-                                                style={{ marginLeft: '10px' }}
-                                            >                                     
-
-                                                { 
-                                                    showProgramAttributesSave && dataStoreProfileExist ? (
-                                                    'Update'
-                                                        ) : (
-                                                    'Save'
-                                                    )
-                                                }
 
 
-                                            </Chip>
-                                        </div>}
+                                                            ))}
+
+                                                        </TableBody>
+                                                    </Table>}
+                                                {selectedProgram.length > 0 && showProgramAttributesSave &&
+                                                    <div className={classes.updateSaveProgramAttributeBtn}>
+                                                        <Chip
+                                                            className={classes.customImageContainer}
+                                                            icon={<IconSave24 alt="SaveAttributes"/>}
+                                                            onClick={() => {
+                                                                handleSaveorUpdateRecord(dataStoreProfileExist ? 'update' : 'create', selectedAttr);
+                                                            }}
+                                                            overflow
+                                                            selected
+                                                            style={{marginLeft: '10px'}}
+                                                        >
+
+                                                            {
+                                                                showProgramAttributesSave && dataStoreProfileExist ? (
+                                                                    'Update'
+                                                                ) : (
+                                                                    'Save'
+                                                                )
+                                                            }
+
+
+                                                        </Chip>
+                                                    </div>}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>                                
+                        </div>
                     </div>
 
                 </div>
