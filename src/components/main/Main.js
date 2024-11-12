@@ -12,8 +12,9 @@ import {
     Button
   } from '@dhis2/ui';
   import { SingleSelectOption, SingleSelect, SingleSelectField  } from '@dhis2-ui/select'
-import { IconSave24, IconChevronDown24, IconChevronRight24, IconInfo16, IconArrowUp16} from '@dhis2/ui-icons'; 
-import { Chip } from '@dhis2-ui/chip'
+import { IconSave24, IconChevronDown24, IconChevronRight24, IconInfo16, IconArrowUp16} from '@dhis2/ui-icons';
+import { Chip } from '@dhis2-ui/chip';
+import { Checkbox } from '@dhis2-ui/checkbox';
 import React, {useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import classes from '../../App.module.css'
@@ -35,7 +36,7 @@ export const Main = () => {
         ({ msg }) => msg,
         ({ type }) => ({ [type]: true })
       )
-    
+
     const engine = useDataEngine();
     const sharedState = useContext(SharedStateContext)
 
@@ -47,10 +48,11 @@ export const Main = () => {
         selectedSharedProgramName,
         matchingSharedThreshold,
         matchingSharedThresholdWeight,
-        persistSharedData
+        persistSharedData,
+        exactMatching
       } = sharedState
-    
-    // console.log('+++++ Main.js ++++++') 
+
+    // console.log('+++++ Main.js ++++++')
     // console.log('selectedSharedOU',selectedSharedOU)
     // console.log('selectedSharedAttr',selectedSharedAttr)
     // console.log('selectedSharedProgram',selectedSharedProgram)
@@ -66,7 +68,7 @@ export const Main = () => {
     // Initialize state for selected values
     const [selectedProgram,setSelectedProgram] = useState(selectedSharedProgram);
     const [fullOrgUnitSearch, setFullOrgUnitSearch] = useState(fullOrgUnitSharedSearch);
-    const [selectedProgramName,setSelectedProgramName] = useState(selectedSharedProgramName?.displayName || []);    
+    const [selectedProgramName,setSelectedProgramName] = useState(selectedSharedProgramName?.displayName || []);
     const [matchingThreshold, extSetMatchThresh] = useState(matchingSharedThreshold);
     const [matchingThresholdWeight, extSetMatchThreshholdWeight] = useState(matchingSharedThresholdWeight);
 
@@ -78,20 +80,21 @@ export const Main = () => {
     const [selectedOUsave, setSelectedOUSave] = useState(false);
     const [selectedOUforQuery, setSelectedOUforQuery] = useState(false);
     const [scrollHeight, setScrollHeight] = useState('350px');
-    
+    const [exactMatch, setExactMatch] = useState(exactMatching);
+
     // if (error) {
 
     //     return <span>ERROR: {error?.message}</span>;
     // }
-    
+
     // if (loading) {
     //     return <span>Loading...</span>;
     // }
     useEffect(() => {
 
         setSelectedOUforQuery(provisionOUs(selectedOU))
-        
-    }, [selectedOU]); 
+
+    }, [selectedOU]);
 
     useEffect(() => {
 		const adjustScrollHeight = () => {
@@ -123,25 +126,25 @@ export const Main = () => {
         }
         if (selectedSharedAttr.length > 0){
             setSelectedAttr(selectedSharedAttr)
-            
+
         }
         if (selectedSharedProgram.length > 0){
             setSelectedProgram(selectedSharedProgram)
             setSelectedProgramName(selectedSharedProgramName)
-  
-            
+
+
         }
         if (fullOrgUnitSharedSearch){
             setFullOrgUnitSearch(fullOrgUnitSharedSearch)
-            
+
         }
         if (matchingSharedThreshold !== null){
             extSetMatchThresh(matchingSharedThreshold)
-            
+
         }
         if (matchingSharedThresholdWeight !== null){
             extSetMatchThreshholdWeight(matchingSharedThresholdWeight)
-            
+
         }
 
 
@@ -151,18 +154,19 @@ export const Main = () => {
     useEffect(()=> {
         sharedState.setMatchingSharedThreshold(matchingThreshold)
         sharedState.setMatchingSharedThresholdWeight(matchingThresholdWeight)
+        sharedState.setExactMatching(exactMatch);
         const checkProgrammName = selectedProgramName?.displayName || []
         if (checkProgrammName.length > 0){
             handleSaveorUpdateRecord(dataStoreProfileExist ? 'update' : 'create', selectedAttr);
         }
-    },[matchingThreshold, matchingThresholdWeight, selectedAttr, selectedOU])
-    
+    },[matchingThreshold, matchingThresholdWeight, selectedAttr, selectedOU, exactMatch])
+
     useEffect(()=>{
         handleSaveorUpdateRecord(dataStoreProfileExist ? 'update' : 'create', selectedAttr);
     }, [fullOrgUnitSearch, selectedAttr, selectedOU])
     /***
      * Org Units Selection Function. Responsible populating OrgUnitsSelected with selected OrgUnits
-     * 
+     *
      */
     const handleOUChange = event => {
         setSelectedOU(event.selected)
@@ -172,7 +176,7 @@ export const Main = () => {
 
     /***
      * Attribute Change Function. Responsible for checkbox functions for attribute
-     * 
+     *
      */
     const handleAttrChange = (target) => {
         setProgramAttributeSave(true)
@@ -185,15 +189,15 @@ export const Main = () => {
             if (selectedAttr && selectedAttr.length <= 1){
                 setSelectedAttr(prevSelected => [...prevSelected, target]);
             }else{
-                show({ msg: i18n.t('Maximum of 2 attributes can be selected for search'), type: 'warning' }) 
+                show({ msg: i18n.t('Maximum of 2 attributes can be selected for search'), type: 'warning' })
                 setProgramAttributeSave(false)
-            }            
+            }
         }
     }
 
     /***
-     * Update Attribute record 
-     * 
+     * Update Attribute record
+     *
      */
     const handleSaveorUpdateRecord = async (action, data) => {
 
@@ -210,13 +214,14 @@ export const Main = () => {
                 fullOrgUnitSearch:fullOrgUnitSearch,
                 matchingThreshold:matchingThreshold,
                 matchingThresholdWeight:matchingThresholdWeight,
-                modifiedDate:modifiedDate(),  
-            };    
-            try {                
+                exactMatching: exactMatch,
+                modifiedDate:modifiedDate(),
+            };
+            try {
                 createOrUpdateDataStore(engine, projectData, config.dataStoreName, selectedProgram, action);
                 setDataStoreProfile(true)
-                constant();         
-            } catch (error) {                
+                constant();
+            } catch (error) {
                 console.error('Error saving to project:', error);
             }
         }
@@ -231,6 +236,7 @@ export const Main = () => {
         sharedState.setSelectedSharedOUforQuery(selectedOUforQuery)
         sharedState.setMatchingSharedThreshold(matchingThreshold)
         sharedState.setMatchingSharedThresholdWeight(matchingThresholdWeight)
+        sharedState.setExactMatching(exactMatch);
         navigate('/results');
         // history.push('/edit')
     }
@@ -247,11 +253,11 @@ export const Main = () => {
     const SingleSelectWithState = ({ index, attr }) => {
         console.log("index: ",index, attr)
         const [selected, setSelected] = useState("0");
-    
+
         const handleSelectChange = ({ selected }) => {
             setSelected(selected);
         };
-    
+
         return (
             <SingleSelect
                 selected={selected}
@@ -272,14 +278,14 @@ export const Main = () => {
             newDataElements[index - 1] = rowItem;
             newDataElements[index] = rowItemReplaced;
             setSelectedAttr(newDataElements)
-            setProgramAttributeSave(true)           
+            setProgramAttributeSave(true)
 
         }
-        
+
     };
 
     return(
-                <div>            
+                <div>
                     <div className={classes.container}>
                         {/* <div className={classes.topnav}>
                             <a href="#home">Home</a>
@@ -290,8 +296,8 @@ export const Main = () => {
 
                         <div className={classes.middle} >
                             <div className={classes.sidenav}>
-                                <OrganisationUnitComponent 
-                                    handleOUChange={handleOUChange} 
+                                <OrganisationUnitComponent
+                                    handleOUChange={handleOUChange}
                                     selectedOU={selectedOU}
                                     selectedProgramName={selectedProgramName?.displayName || []}
                                 />
@@ -302,11 +308,11 @@ export const Main = () => {
                                                 onClick={() => {
                                                     handleSaveorUpdateRecord(dataStoreProfileExist ? 'update' : 'create', selectedAttr);
                                                 }}
-                                                overflow 
+                                                overflow
                                                 selected
                                                 style={{ marginLeft: '10px' }}
-                                            >  
-                                                { 
+                                            >
+                                                {
                                                     selectedOUsave && dataStoreProfileExist ? (
                                                     'Update OU Search List'
                                                         ) : (
@@ -316,42 +322,47 @@ export const Main = () => {
                                             </Chip>
                                         </div>} */}
                             </div>
-                            <div style={{ width:'100%'}}>                                
+                            <div style={{ width:'100%'}}>
                                 <div className={classes.headerTitle}>
                                     <h2>{MainTitle}</h2>
-                                    
+
                                     <span>
                                         {panelAction}
                                     </span>
                                 </div>
-                                <div className={classes.main}>                
+                                <div className={classes.main}>
                                     <div className={classes.panelmiddle}>
                                         <span style={{fontWeight:'bold' }}> {i18n.t('Select program')}</span>
                                         <div style={{marginTop: '10px' }}>
-                                            <ProgramComponent 
-                                                selectedProgram={selectedProgram}                                             
+                                            <ProgramComponent
+                                                selectedProgram={selectedProgram}
                                                 setSelectedProgram={setSelectedProgram}
                                                 setSelectedProgramName={setSelectedProgramName}
                                                 setDataStoreProfile={setDataStoreProfile}
                                             />
                                         </div>
-                                        
-                                        <div style={{marginTop: '20px' }}>
-                                            <ThresholdInput matchingThreshold={matchingThreshold} 
-                                                            extSetMatchThresh={extSetMatchThresh}
-                                                            dataStoreProfileExist={dataStoreProfileExist}
-                                                            selectedProgramName={selectedProgramName}
-                                                            showProgramAttributesSave={showProgramAttributesSave}
-                                                            selectedAttr={selectedAttr}
-                                                            matchingThresholdWeight={matchingThresholdWeight}
-                                                            extSetMatchThreshholdWeight={extSetMatchThreshholdWeight}
-                                                            scrollHeight={scrollHeight}
+                                        {selectedProgram.length > 0 && <div style={{marginTop: '20px'}}>
+                                            <Checkbox checked={exactMatch} onChange={(value) => setExactMatch(value.checked)} label="Enable exact match" />
+                                        </div>
+                                        }
+                                        {!exactMatch &&
+                                            <div style={{marginTop: '20px'}}>
+                                                <ThresholdInput matchingThreshold={matchingThreshold}
+                                                                extSetMatchThresh={extSetMatchThresh}
+                                                                dataStoreProfileExist={dataStoreProfileExist}
+                                                                selectedProgramName={selectedProgramName}
+                                                                showProgramAttributesSave={showProgramAttributesSave}
+                                                                selectedAttr={selectedAttr}
+                                                                matchingThresholdWeight={matchingThresholdWeight}
+                                                                extSetMatchThreshholdWeight={extSetMatchThreshholdWeight}
+                                                                scrollHeight={scrollHeight}
 
-                                                            />
+                                                />
                                             </div>
-                                        
+                                        }
 
-                                        {selectedProgram.length > 0 && 
+
+                                        {selectedProgram.length > 0 &&
                                         <div className={classes.RuleDescription}>
                                             <span><IconInfo16/></span>
                                             <span style={{marginLeft:'5px'}}>
@@ -359,32 +370,32 @@ export const Main = () => {
                                                 <span style={{fontSize:'11px'}}>
                                                         {i18n.t('Sherlock will search for matches or near matches of the program attributes')}
                                                 </span>
-                                                 
+
                                             </span>
 
                                         </div>
                                         }
-                                        {selectedProgram.length > 0 && 
+                                        {selectedProgram.length > 0 &&
                                         <div style={{ display: 'flex', marginTop: '5px' }}>
                                             <div>
-                                                <Button 
-                                                    basic 
-                                                    onClick={handleFindDuplicates} 
+                                                <Button
+                                                    basic
+                                                    onClick={handleFindDuplicates}
                                                     disabled={!(selectedOU.length > 0 && selectedAttr.length > 0 && selectedProgram.length > 0 && showProgramAttributesSave === false)}
-                                                    >                                                        
+                                                    >
                                                         {i18n.t('Find Duplicates')}
                                                 </Button>
                                             </div>
                                             <div style={{alignContent: 'center', marginLeft:'10px'}}>
-                                                <Switch 
-                                                    checked={fullOrgUnitSearch === false} 
+                                                <Switch
+                                                    checked={fullOrgUnitSearch === false}
                                                     label={fullOrgUnitSearch ?  searchBoundaryfull  : searchBoundarySelected}
                                                     onChange={() => {
                                                         setFullOrgUnitSearch((prev) => !prev);
                                                     }}
                                                 />
                                             </div>
-                                        
+
 
                                         </div>
                                         }
@@ -408,17 +419,17 @@ export const Main = () => {
                                                         setProgramAttribute((prev) => !prev);
                                                         setProgramAttributeExpand((prev) => !prev);
                                                     }}
-                                                    selected={showProgramAttributesExpand}                                                   
+                                                    selected={showProgramAttributesExpand}
                                                 >
                                                     {i18n.t('Add or Remove Attributes in Duplicate Checker')}
-                                                    
+
                                                 </Chip>}
                                                 </span>
                                         </span>
                                         <div style={{marginTop: '10px' }}>
-                                                <ProjectAttributeComponent 
-                                                    handleAttrChange={handleAttrChange} 
-                                                    selectedAttr={selectedAttr} 
+                                                <ProjectAttributeComponent
+                                                    handleAttrChange={handleAttrChange}
+                                                    selectedAttr={selectedAttr}
                                                     setSelectedAttr={setSelectedAttr}
                                                     selectedProgramID={selectedProgram}
                                                     extSetMatchThresh={extSetMatchThresh}
@@ -427,7 +438,7 @@ export const Main = () => {
                                                     setSelectedOU={setSelectedOU}
                                                     extSetMatchThreshholdWeight={extSetMatchThreshholdWeight}
                                                     setFullOrgUnitSearch={setFullOrgUnitSearch}
-                                                    
+
                                                 />
                                         </div>
 
@@ -465,12 +476,12 @@ export const Main = () => {
                                                 onClick={() => {
                                                     handleSaveorUpdateRecord(dataStoreProfileExist ? 'update' : 'create', selectedAttr);
                                                 }}
-                                                overflow 
+                                                overflow
                                                 selected
                                                 style={{ marginLeft: '10px' }}
-                                            >                                     
+                                            >
 
-                                                { 
+                                                {
                                                     showProgramAttributesSave && dataStoreProfileExist ? (
                                                     'Update'
                                                         ) : (
@@ -485,7 +496,7 @@ export const Main = () => {
                                     </div>
                                 </div>
                             </div>
-                        </div>                                
+                        </div>
                     </div>
 
                 </div>

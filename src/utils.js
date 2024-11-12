@@ -2,7 +2,7 @@ import React, { createContext,  useState, useCallback} from 'react';
 import classes from './App.module.css'
 import refresh from './icons/refresh.png'
 import search from './icons/search.png'
-import { match_threshold, match_threshold_weight } from './consts'; 
+import { match_threshold, match_threshold_weight } from './consts';
 
 
 export const customImage = (source, size='small') => {
@@ -56,7 +56,7 @@ export const createOrUpdateDataStore = async (engine, postObject, store, key, mo
   } catch (error) {
     console.error('Error creating or updating object:', error);
     // throw error;
-    
+
   }
 }
 
@@ -70,7 +70,7 @@ export const createMetadata = async (engine, postObject, mode)=>{
       });
         return { success: true, message: result };
     } catch (error) {
-        return { success: false, message: error };          
+        return { success: false, message: error };
     }
 }
 
@@ -94,7 +94,7 @@ export const mergeTrackedEntities = async (engine, payload) => {
           // setReportPage(response.response.id)
           // setMergeAction(false)
           // show({msg: response.response.location+'/report', type: 'warning'})
-  
+
         } catch (error) {
           console.error('trackedEntity error response: ' +  error);
           return('')
@@ -116,24 +116,24 @@ export const updateTrackedEntityIgnoreAll = async (engine, tei_value, payload, t
           let ignoreAttr =  {
             "attribute": "sher1dupli1",
             "displayName": "Ignored duplicate",
-            "valueType": "LONG_TEXT"  
+            "valueType": "LONG_TEXT"
           }
-  
-  
+
+
           const exist = entity.attributes.filter(attr => attr.attribute === "sher1dupli1") || []
-  
+
           if (exist.length > 0){
               console.log('entity: ', entity)
               const existIgnoredValues = exist.map(item => item.value);
               const existIgnoredValuesAndNew = `${existIgnoredValues[0]};${tei_value.trackedEntity}`
                   // Remove all instances of "sher1dupli1"
               entity.attributes = entity.attributes.filter(attr => attr.attribute !== "sher1dupli1");
-              ignoreAttr.value = removeDuplicates(existIgnoredValuesAndNew);  
+              ignoreAttr.value = removeDuplicates(existIgnoredValuesAndNew);
           }else{
               // Remove all instances of "sher1dupli1"
               entity.attributes = entity.attributes.filter(attr => attr.attribute !== "sher1dupli1");
-              ignoreAttr.value = tei_value.trackedEntity;  
-          }      
+              ignoreAttr.value = tei_value.trackedEntity;
+          }
           entity.attributes.push(ignoreAttr)
           entity.trackedEntityType = trackedEntityType
           trackedEntities.push(entity);
@@ -178,7 +178,7 @@ export const updateTrackedEntityIgnoreAll = async (engine, tei_value, payload, t
 
       });
       console.log('trackedEntity update response:', response);
-      
+
       // successMessage();
       //handleCloseModal();
   } catch (error) {
@@ -263,21 +263,21 @@ export const updateTrackedEntityIgnore = async (engine, teiUpdate, tei_value, pa
           } catch (error) {
               console.error('trackedEntity error response: ' +  error);
           }
-  // } 
+  // }
 }
 
 export const removeDuplicates = (inputString) => {
   // Split the string by ';'
   const array = inputString.split(';');
-  
+
   // Create a Set to remove duplicates
   const uniqueArray = [...new Set(array)];
-  
+
   // Join the array back into a string
   return uniqueArray.join(';');
 };
 
-  
+
   export const delete_tei = async (engine, tei) => {
 
   try {
@@ -364,7 +364,10 @@ export const SharedStateContext = createContext({
   matchingSharedThresholdWeight: match_threshold_weight,
   setMatchingSharedThresholdWeight:() => {},
   persistSharedData: [],
-  setPersistSharedData:() => {}
+  setPersistSharedData:() => {},
+    setExactMatching: () => {
+    },
+    exactMatching: false,
 
 })
 
@@ -378,14 +381,15 @@ export const useSharedState = () => {
   const [matchingSharedThreshold, setMatchingSharedThreshold_] = useState(match_threshold);
   const [matchingSharedThresholdWeight, setMatchingSharedThresholdWeight_] = useState(match_threshold_weight);
   const [persistSharedData, setPersistSharedData_] = useState([]);
-  
-  
-  // memoizedCallbacks 
+    const [exactMatching, setExactMatching_] = useState(false);
+
+
+  // memoizedCallbacks
   /**
-   * preventing unnecessary re-renders of child components when 
-   * the callback reference remains unchanged. It optimizes performance by 
+   * preventing unnecessary re-renders of child components when
+   * the callback reference remains unchanged. It optimizes performance by
    * avoiding the recreation of callbacks on each render
-   * 
+   *
    */
   const setSelectedSharedOU = useCallback((data) => {
     setSelectedSharedOU_(data)
@@ -414,9 +418,13 @@ export const useSharedState = () => {
   const setPersistSharedData = useCallback((data) => {
     setPersistSharedData_(data)
   }, [])
- 
+    const setExactMatching = useCallback((data) => {
+        setExactMatching_(data)
+    }, [])
 
-  return {
+
+
+    return {
     selectedSharedOU,
     setSelectedSharedOU,
     selectedSharedAttr,
@@ -434,7 +442,9 @@ export const useSharedState = () => {
     matchingSharedThresholdWeight,
     setMatchingSharedThresholdWeight,
     persistSharedData,
-    setPersistSharedData
+    setPersistSharedData,
+        exactMatching,
+        setExactMatching
   }
 }
 
